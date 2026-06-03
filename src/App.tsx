@@ -7,7 +7,6 @@ import { Editor } from "./components/modules/Editor";
 import { Signage } from "./components/modules/Signage";
 import { SensoryMap } from "./components/modules/SensoryMap";
 import { Medicion } from "./components/modules/Medicion";
-import { Generativo } from "./components/modules/Generativo";
 import { Etiquetas } from "./components/modules/Etiquetas";
 
 export default function App() {
@@ -28,7 +27,6 @@ export default function App() {
         {module === "signage" && <Signage zones={zones} onZonesChange={setZones} />}
         {module === "map" && <SensoryMap zones={zones} />}
         {module === "medicion" && <Medicion zones={zones} onZonesChange={setZones} />}
-        {module === "generative" && <Generativo />}
         {module === "etiquetas" && <Etiquetas />}
       </div>
     </AppShell>

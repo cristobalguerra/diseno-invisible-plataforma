@@ -1,9 +1,9 @@
 import type { ReactNode } from "react";
-import { Gauge, Grid3x3, LayoutGrid, Map as MapIcon, Radar, Signpost, SlidersHorizontal } from "lucide-react";
+import { Gauge, LayoutGrid, Map as MapIcon, Radar, Signpost, SlidersHorizontal } from "lucide-react";
 import { cx } from "../ui/kit";
 import { BrandMark } from "./BrandMark";
 
-export type ModuleId = "library" | "editor" | "signage" | "map" | "medicion" | "generative" | "etiquetas";
+export type ModuleId = "library" | "editor" | "signage" | "map" | "medicion" | "etiquetas";
 
 const NAV: { id: ModuleId; n: string; label: string; desc: string; icon: typeof LayoutGrid }[] = [
   { id: "library", n: "01", label: "Biblioteca", desc: "21 especímenes", icon: LayoutGrid },
@@ -11,8 +11,7 @@ const NAV: { id: ModuleId; n: string; label: string; desc: string; icon: typeof 
   { id: "signage", n: "03", label: "Señalética", desc: "Ficha por zona", icon: Signpost },
   { id: "map", n: "04", label: "Mapa sensorial", desc: "Perfil del recorrido", icon: MapIcon },
   { id: "medicion", n: "05", label: "Medición", desc: "Cámara y micrófono", icon: Gauge },
-  { id: "generative", n: "06", label: "Sistema generativo", desc: "Retícula 9×9 · 5 niveles", icon: Grid3x3 },
-  { id: "etiquetas", n: "07", label: "Etiquetas sensoriales", desc: "Sello radial por espacio", icon: Radar },
+  { id: "etiquetas", n: "06", label: "Etiquetas sensoriales", desc: "Sello radial por espacio", icon: Radar },
 ];
 
 export function AppShell({

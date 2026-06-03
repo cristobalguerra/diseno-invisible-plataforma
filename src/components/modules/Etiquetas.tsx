@@ -69,7 +69,7 @@ export function Etiquetas() {
   return (
     <div className="flex flex-col">
       <header className="border-b border-line px-5 py-6 md:px-8 md:py-7">
-        <Eyebrow>07 · Etiquetas sensoriales</Eyebrow>
+        <Eyebrow>06 · Etiquetas sensoriales</Eyebrow>
         <h1 className="mt-2 text-[26px] font-bold leading-[1.1] tracking-tight text-ink md:text-[30px]">
           Sello sensorial generativo
         </h1>
