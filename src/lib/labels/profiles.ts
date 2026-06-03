@@ -15,13 +15,15 @@ function pr(
   return { intensity, peak, variability, duration, predictability, confidence, source };
 }
 
-function profile(id: string, code: string, name: string, p: ProfileParams): SensorProfile {
-  return { id, code, name, params: p };
+function space(id: string, code: string, site: string, name: string, p: ProfileParams): SensorProfile {
+  return { id, code, site, name, params: p };
 }
 
-/* Perfiles de ejemplo: mismos parámetros, datos distintos → sellos distintos. */
+/* Espacios de ejemplo, AGRUPADOS por sitio. El repositorio crece por grupos:
+   un edificio (p. ej. Museo MARCO) y, dentro, sus espacios medidos. */
 export const PROFILES: SensorProfile[] = [
-  profile("vestibulo", "PERF-01", "Vestíbulo principal", {
+  // ── Museo MARCO ──────────────────────────────────────────────────────────
+  space("marco-vestibulo", "MARCO-01", "Museo MARCO", "Vestíbulo principal", {
     sound: pr(0.82, 0.92, 0.5, 0.8, 0.5, 0.9, "sensor"),
     light: pr(0.7, 0.85, 0.4, 0.7, 0.6, 0.85, "sensor"),
     flow: pr(0.9, 0.95, 0.6, 0.85, 0.35, 0.8, "sensor"),
@@ -30,7 +32,7 @@ export const PROFILES: SensorProfile[] = [
     visual: pr(0.78, 0.85, 0.65, 0.7, 0.4, 0.75, "sensor"),
     pause: pr(0.2, 0.3, 0.3, 0.3, 0.7, 0.6, "survey"),
   }),
-  profile("espera", "PERF-02", "Sala de espera", {
+  space("marco-espera", "MARCO-02", "Museo MARCO", "Sala de espera", {
     sound: pr(0.45, 0.6, 0.35, 0.6, 0.6, 0.8, "sensor"),
     light: pr(0.5, 0.55, 0.25, 0.6, 0.7, 0.85, "sensor"),
     flow: pr(0.3, 0.45, 0.4, 0.4, 0.6, 0.7, "observation"),
@@ -39,7 +41,7 @@ export const PROFILES: SensorProfile[] = [
     visual: pr(0.45, 0.55, 0.4, 0.5, 0.6, 0.7, "sensor"),
     pause: pr(0.6, 0.5, 0.3, 0.6, 0.75, 0.7, "survey"),
   }),
-  profile("pasillo", "PERF-03", "Pasillo norte", {
+  space("marco-pasillo", "MARCO-03", "Museo MARCO", "Pasillo norte", {
     sound: pr(0.5, 0.7, 0.6, 0.5, 0.4, 0.6, "observation"),
     light: pr(0.4, 0.6, 0.5, 0.5, 0.45, 0.6, "observation"),
     flow: pr(0.65, 0.8, 0.7, 0.6, 0.4, 0.7, "sensor"),
@@ -48,7 +50,7 @@ export const PROFILES: SensorProfile[] = [
     visual: pr(0.6, 0.7, 0.6, 0.55, 0.4, 0.6, "sensor"),
     pause: pr(0.25, 0.35, 0.4, 0.3, 0.6, 0.55, "survey"),
   }),
-  profile("patio", "PERF-04", "Patio tranquilo", {
+  space("marco-patio", "MARCO-04", "Museo MARCO", "Patio tranquilo", {
     sound: pr(0.2, 0.35, 0.25, 0.3, 0.8, 0.85, "sensor"),
     light: pr(0.45, 0.5, 0.3, 0.5, 0.8, 0.85, "sensor"),
     flow: pr(0.2, 0.3, 0.3, 0.3, 0.8, 0.8, "observation"),
@@ -56,6 +58,25 @@ export const PROFILES: SensorProfile[] = [
     orientation: pr(0.25, 0.3, 0.2, 0.3, 0.85, 0.8, "observation"),
     visual: pr(0.2, 0.3, 0.25, 0.3, 0.8, 0.8, "sensor"),
     pause: pr(0.85, 0.7, 0.2, 0.8, 0.85, 0.9, "survey"),
+  }),
+  // ── Biblioteca UDEM ──────────────────────────────────────────────────────
+  space("bib-lectura", "UDEM-01", "Biblioteca UDEM", "Sala de lectura", {
+    sound: pr(0.25, 0.4, 0.3, 0.4, 0.7, 0.8, "sensor"),
+    light: pr(0.55, 0.6, 0.25, 0.6, 0.8, 0.85, "sensor"),
+    flow: pr(0.3, 0.45, 0.35, 0.4, 0.65, 0.75, "observation"),
+    wait: pr(0.3, 0.4, 0.3, 0.4, 0.6, 0.7, "observation"),
+    orientation: pr(0.35, 0.4, 0.3, 0.4, 0.75, 0.7, "observation"),
+    visual: pr(0.35, 0.45, 0.35, 0.4, 0.6, 0.7, "sensor"),
+    pause: pr(0.75, 0.6, 0.25, 0.7, 0.8, 0.85, "survey"),
+  }),
+  space("bib-acceso", "UDEM-02", "Biblioteca UDEM", "Acceso principal", {
+    sound: pr(0.55, 0.7, 0.45, 0.6, 0.5, 0.75, "sensor"),
+    light: pr(0.6, 0.7, 0.4, 0.6, 0.6, 0.8, "sensor"),
+    flow: pr(0.8, 0.9, 0.6, 0.8, 0.4, 0.8, "sensor"),
+    wait: pr(0.4, 0.55, 0.45, 0.5, 0.55, 0.7, "observation"),
+    orientation: pr(0.55, 0.6, 0.5, 0.5, 0.4, 0.65, "survey"),
+    visual: pr(0.65, 0.75, 0.55, 0.6, 0.45, 0.7, "sensor"),
+    pause: pr(0.2, 0.3, 0.3, 0.3, 0.7, 0.6, "survey"),
   }),
 ];
 
@@ -84,24 +105,14 @@ export function intensitySeverity(x: number): 0 | 1 | 2 {
   return 2;
 }
 
-const SOURCES: DataSource[] = ["sensor", "observation", "survey"];
-
-/** Genera un perfil con datos aleatorios (demuestra la variedad del sistema). */
-export function randomProfile(n: number): SensorProfile {
-  const rnd = () => Math.round(Math.random() * 100) / 100;
-  const params = {} as ProfileParams;
-  for (const c of RING_ORDER) {
-    params[c] = pr(
-      rnd(),
-      Math.min(1, rnd() * 0.5 + 0.5),
-      rnd(),
-      rnd(),
-      rnd(),
-      Math.min(1, rnd() * 0.4 + 0.5),
-      SOURCES[Math.floor(Math.random() * SOURCES.length)],
-    );
-  }
-  return profile(`rnd-${n}`, `GEN-${String(n).padStart(2, "0")}`, `Espacio generado ${n}`, params);
+/** prefijo de código del sitio: usa el acrónimo si lo hay, si no las iniciales.
+ *  "Museo MARCO" → "MARCO" · "Biblioteca UDEM" → "UDEM" · "Hospital General" → "HG" */
+export function siteCode(site: string): string {
+  const words = site.split(/\s+/).filter(Boolean);
+  const acronym = words.find((w) => w.length >= 2 && w === w.toUpperCase() && /[A-ZÁÉÍÓÚÑ]/.test(w));
+  if (acronym) return acronym.replace(/[^A-Za-zÁÉÍÓÚÑ0-9]/g, "").slice(0, 6).toUpperCase();
+  const initials = words.map((w) => w[0]).join("").replace(/[^A-Za-zÁÉÍÓÚÑ]/g, "").toUpperCase().slice(0, 4);
+  return initials || "ESP";
 }
 
 /** Actualiza un parámetro de una categoría devolviendo un nuevo perfil. */
@@ -112,4 +123,39 @@ export function setParam(
   value: number | DataSource,
 ): SensorProfile {
   return { ...p, params: { ...p.params, [cat]: { ...p.params[cat], [key]: value } } };
+}
+
+/* ----------------------------------------------------------- repositorio -- */
+/**
+ * Persistencia local del repositorio de espacios medidos: el catálogo "se va
+ * alimentando" entre sesiones conforme la investigación levanta más espacios.
+ */
+const STORAGE_KEY = "di-espacios-v2";
+
+export function loadProfiles(): SensorProfile[] {
+  try {
+    const raw = typeof localStorage !== "undefined" ? localStorage.getItem(STORAGE_KEY) : null;
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length) return parsed as SensorProfile[];
+    }
+  } catch {
+    /* almacenamiento no disponible → se usan los espacios de ejemplo */
+  }
+  return PROFILES;
+}
+
+export function saveProfiles(list: SensorProfile[]): void {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+  } catch {
+    /* sin persistencia (modo privado, etc.) */
+  }
+}
+
+/** Crea un espacio recién registrado con parámetros neutros (a la espera de datos). */
+export function newSpace(name: string, code: string, site: string): SensorProfile {
+  const params = {} as ProfileParams;
+  for (const c of RING_ORDER) params[c] = pr(0.4, 0.5, 0.4, 0.4, 0.6, 0.7, "observation");
+  return { id: `esp-${Date.now()}`, code, site, name, params };
 }

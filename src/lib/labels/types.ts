@@ -34,9 +34,11 @@ export type ProfileParams = Record<CategoryId, CategoryParams>;
 
 export interface SensorProfile {
   id: string;
-  /** código del perfil, p. ej. "PERF-01" */
+  /** código del perfil, p. ej. "MARCO-01" */
   code: string;
-  /** nombre del espacio */
+  /** sitio / edificio al que pertenece, p. ej. "Museo MARCO" (agrupa espacios) */
+  site: string;
+  /** nombre del espacio, p. ej. "Sala de espera" */
   name: string;
   params: ProfileParams;
 }

@@ -1,17 +1,14 @@
 import type { ReactNode } from "react";
-import { Gauge, LayoutGrid, Map as MapIcon, Radar, Signpost, SlidersHorizontal } from "lucide-react";
+import { Gauge, LayoutGrid, Radar } from "lucide-react";
 import { cx } from "../ui/kit";
 import { BrandMark } from "./BrandMark";
 
-export type ModuleId = "library" | "editor" | "signage" | "map" | "medicion" | "etiquetas";
+export type ModuleId = "library" | "etiquetas" | "medicion";
 
 const NAV: { id: ModuleId; n: string; label: string; desc: string; icon: typeof LayoutGrid }[] = [
-  { id: "library", n: "01", label: "Biblioteca", desc: "21 especímenes", icon: LayoutGrid },
-  { id: "editor", n: "02", label: "Editor", desc: "Parametrizar y exportar", icon: SlidersHorizontal },
-  { id: "signage", n: "03", label: "Señalética", desc: "Ficha por zona", icon: Signpost },
-  { id: "map", n: "04", label: "Mapa sensorial", desc: "Perfil del recorrido", icon: MapIcon },
-  { id: "medicion", n: "05", label: "Medición", desc: "Cámara y micrófono", icon: Gauge },
-  { id: "etiquetas", n: "06", label: "Etiquetas sensoriales", desc: "Sello radial por espacio", icon: Radar },
+  { id: "library", n: "01", label: "Espacios medidos", desc: "Repositorio de la investigación", icon: LayoutGrid },
+  { id: "etiquetas", n: "02", label: "Estudio del sello", desc: "Sello + recorrido sensorial", icon: Radar },
+  { id: "medicion", n: "03", label: "Medición", desc: "Cámara y micrófono", icon: Gauge },
 ];
 
 export function AppShell({

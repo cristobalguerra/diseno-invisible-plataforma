@@ -1,20 +1,15 @@
 import { useMemo, useRef, useState } from "react";
-import { Download, ScanLine, Shuffle } from "lucide-react";
+import { Download, ScanLine } from "lucide-react";
 import type { CategoryId } from "../../lib/types";
-import { CATEGORIES, getCategory, CATEGORY_COLOR } from "../../data/catalog";
+import { CATEGORIES, CATEGORY_COLOR } from "../../data/catalog";
 import type { CategoryParams, DataSource, SensorProfile } from "../../lib/labels/types";
 import { SOURCE_SHORT } from "../../lib/labels/types";
-import { PROFILES, globalLoad, randomProfile, setParam } from "../../lib/labels/profiles";
+import { globalLoad, setParam } from "../../lib/labels/profiles";
 import { profileSheet } from "../../lib/labels/sheet";
 import { downloadPng, downloadSvg } from "../../lib/export";
-import { Button, Eyebrow, Segmented, Toggle, cx } from "../ui/kit";
-import { SealLegend, SensorSeal, type Complexity } from "../labels/SensorSeal";
-
-const COMPLEXITY_NOTE: Record<Complexity, string> = {
-  1: "Señal mínima: solo intensidad (longitud) y duración (grosor) por categoría.",
-  2: "Media: añade pico y fragmentación leve, manteniendo el orden.",
-  3: "Completa: variabilidad, predictibilidad, fuente y densidad global.",
-};
+import { Button, Eyebrow, Segmented, cx } from "../ui/kit";
+import { SealLegend, SensorSeal } from "../labels/SensorSeal";
+import { Recorrido } from "../labels/Recorrido";
 
 const PARAMS: { key: keyof CategoryParams; label: string }[] = [
   { key: "intensity", label: "Intensidad promedio" },
@@ -25,43 +20,38 @@ const PARAMS: { key: keyof CategoryParams; label: string }[] = [
   { key: "confidence", label: "Confianza del dato" },
 ];
 
+/** lo que el sello (color, nivel 1) muestra de verdad */
 const MAPPING: [string, string][] = [
-  ["Intensidad", "expansión radial"],
-  ["Duración", "grosor del trazo"],
-  ["Variabilidad", "fragmentación"],
-  ["Predictibilidad", "orden / alteración"],
-  ["Pico máximo", "acento exterior"],
-  ["Categoría", "posición fija"],
-  ["Carga global", "densidad de anillos"],
-  ["Fuente / confianza", "marcador interior"],
+  ["Intensidad", "longitud del radio"],
+  ["Duración", "grosor del radio"],
+  ["Categoría", "posición fija + color"],
+  ["Confianza", "opacidad del radio"],
 ];
 
 const SOURCES: DataSource[] = ["sensor", "observation", "survey"];
 
-export function Etiquetas() {
-  const [profiles, setProfiles] = useState<SensorProfile[]>(PROFILES);
-  const [selectedId, setSelectedId] = useState(PROFILES[0].id);
+export function Etiquetas({
+  profiles,
+  onProfilesChange,
+  selectedId,
+  onSelectId,
+}: {
+  profiles: SensorProfile[];
+  onProfilesChange: (p: SensorProfile[]) => void;
+  selectedId: string;
+  onSelectId: (id: string) => void;
+}) {
   const [selectedCat, setSelectedCat] = useState<CategoryId>("sound");
-  const [color, setColor] = useState(false);
-  const [complexity, setComplexity] = useState<Complexity>(1);
   const [tab, setTab] = useState<"datos" | "ficha">("datos");
-  const [rndN, setRndN] = useState(1);
   const sealRef = useRef<SVGSVGElement>(null);
 
   const profile = profiles.find((p) => p.id === selectedId) ?? profiles[0];
-  const colorMode = color ? "color" : "mono";
   const load = globalLoad(profile);
   const sheet = useMemo(() => profileSheet(profile), [profile]);
   const cp = profile.params[selectedCat];
 
   function patch(key: keyof CategoryParams, value: number | DataSource) {
-    setProfiles((list) => list.map((p) => (p.id === profile.id ? setParam(p, selectedCat, key, value) : p)));
-  }
-  function addRandom() {
-    const p = randomProfile(rndN);
-    setProfiles((list) => [...list, p]);
-    setSelectedId(p.id);
-    setRndN((n) => n + 1);
+    onProfilesChange(profiles.map((p) => (p.id === profile.id ? setParam(p, selectedCat, key, value) : p)));
   }
 
   const fname = `sello-${profile.code}`;
@@ -69,15 +59,15 @@ export function Etiquetas() {
   return (
     <div className="flex flex-col">
       <header className="border-b border-line px-5 py-6 md:px-8 md:py-7">
-        <Eyebrow>06 · Etiquetas sensoriales</Eyebrow>
+        <Eyebrow>02 · Estudio del sello</Eyebrow>
         <h1 className="mt-2 text-[26px] font-bold leading-[1.1] tracking-tight text-ink md:text-[30px]">
           Sello sensorial generativo
         </h1>
         <p className="mt-2 max-w-[68ch] text-[14px] leading-relaxed text-ink-2">
-          Un marcador circular-radial, generado por datos del espacio, que codifica el perfil
-          sensorial completo. No es un pictograma: es un <strong>sello reconocible</strong> de la
-          familia. Cada categoría ocupa una <strong>posición fija</strong> y sus parámetros se
-          traducen a atributos gráficos. Al escanear, abre la ficha de anticipación.
+          El sello de un espacio se <strong>genera</strong> de sus datos: cada categoría ocupa una
+          <strong> posición fija</strong> y se dibuja como un radio en su <strong>color</strong>
+          (longitud = intensidad, grosor = duración). Aquí capturas o corriges los datos medidos y el
+          sello se regenera. Al escanear, abre la ficha de anticipación.
         </p>
       </header>
 
@@ -86,14 +76,14 @@ export function Etiquetas() {
         <section className="flex flex-col gap-5">
           <div className="flex flex-col items-center gap-3 rounded-md border border-line bg-sunken p-6">
             <div className="w-full max-w-[360px]" style={{ aspectRatio: "1 / 1" }}>
-              <SensorSeal ref={sealRef} profile={profile} colorMode={colorMode} complexity={complexity} />
+              <SensorSeal ref={sealRef} profile={profile} />
             </div>
             <div className="flex w-full items-baseline justify-between border-t border-line pt-3">
-              <div>
-                <span className="font-mono text-[11px] text-ink-3">{profile.code}</span>
-                <span className="ml-2 text-[14px] font-semibold text-ink">{profile.name}</span>
+              <div className="min-w-0">
+                <div className="truncate font-mono text-[11px] text-ink-3">{profile.code} · {profile.site}</div>
+                <div className="text-[14px] font-semibold text-ink">{profile.name}</div>
               </div>
-              <span className="font-mono text-[11px] text-ink-3">carga {Math.round(load * 100)}%</span>
+              <span className="shrink-0 font-mono text-[11px] text-ink-3">carga {Math.round(load * 100)}%</span>
             </div>
           </div>
 
@@ -105,40 +95,34 @@ export function Etiquetas() {
             <div className="min-w-0">
               <div className="text-[12px] font-semibold text-ink">Posiciones fijas</div>
               <p className="mt-1 text-[12px] leading-snug text-ink-2">
-                Cada categoría ocupa siempre el mismo sector del anillo. Esa constancia es lo que
-                vuelve el sistema aprendible: con el tiempo se reconoce un perfil de un vistazo.
+                Cada categoría ocupa siempre el mismo sector y color del anillo. Esa constancia es lo
+                que vuelve el sistema aprendible: con el tiempo se reconoce un perfil de un vistazo.
               </p>
             </div>
           </div>
 
-          <div className="flex flex-col gap-2 rounded-md border border-line bg-paper p-4">
-            <div className="flex items-center gap-3">
-              <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-3">Complejidad visual</span>
-              <div className="inline-flex rounded-sm border border-line-strong bg-canvas p-0.5">
-                {([1, 2, 3] as Complexity[]).map((n) => (
-                  <button
-                    key={n}
-                    type="button"
-                    onClick={() => setComplexity(n)}
-                    aria-pressed={complexity === n}
-                    className={cx(
-                      "w-8 rounded-[2px] py-1 text-[12px] font-semibold transition duration-150 ease-out active:scale-[0.94]",
-                      complexity === n ? "bg-ink text-canvas" : "text-ink-2 hover:text-ink",
-                    )}
-                  >
-                    {n}
-                  </button>
-                ))}
-              </div>
-            </div>
-            <p className="text-[12px] leading-snug text-ink-2">{COMPLEXITY_NOTE[complexity]}</p>
-          </div>
-
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="flex items-center gap-3">
-              <Button icon={<Shuffle size={14} />} onClick={addRandom}>Generar aleatorio</Button>
-              <Toggle checked={color} onChange={setColor} label="Color" />
-            </div>
+            <label className="flex items-center gap-2 text-[12px] text-ink-2">
+              Espacio
+              <select
+                value={profile.id}
+                onChange={(e) => onSelectId(e.target.value)}
+                className="max-w-[220px] rounded-sm border border-line-strong bg-paper px-2 py-1 text-[13px] text-ink transition-colors duration-150 ease-out focus-visible:border-accent"
+              >
+                {Object.entries(
+                  profiles.reduce((acc, p) => {
+                    (acc[p.site] ??= []).push(p);
+                    return acc;
+                  }, {} as Record<string, SensorProfile[]>),
+                ).map(([s, list]) => (
+                  <optgroup key={s} label={s}>
+                    {list.map((p) => (
+                      <option key={p.id} value={p.id}>{p.name}</option>
+                    ))}
+                  </optgroup>
+                ))}
+              </select>
+            </label>
             <div className="flex gap-2">
               <Button icon={<Download size={14} />} onClick={() => sealRef.current && downloadSvg(sealRef.current, fname)}>SVG</Button>
               <Button icon={<Download size={14} />} onClick={() => sealRef.current && downloadPng(sealRef.current, fname)}>PNG</Button>
@@ -204,7 +188,7 @@ export function Etiquetas() {
               </div>
 
               <div className="mt-1 rounded-sm border border-line bg-sunken p-3">
-                <div className="mb-1.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-ink-3">Cómo se codifica</div>
+                <div className="mb-1.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-ink-3">Qué muestra el sello</div>
                 <div className="grid grid-cols-2 gap-x-3 gap-y-1">
                   {MAPPING.map(([k, v]) => (
                     <div key={k} className="flex items-baseline gap-1.5 text-[11px] leading-snug">
@@ -213,6 +197,10 @@ export function Etiquetas() {
                     </div>
                   ))}
                 </div>
+                <p className="mt-2 text-[11px] leading-snug text-ink-3">
+                  El resto de parámetros (pico, variabilidad, predictibilidad, fuente) se registran y
+                  alimentan la ficha de anticipación.
+                </p>
               </div>
             </>
           ) : (
@@ -243,35 +231,17 @@ export function Etiquetas() {
         </aside>
       </div>
 
-      {/* familia / variedad */}
+      {/* recorrido sensorial — el mapa, integrado: la experiencia de todo lo medido */}
       <section className="border-t border-line px-5 py-6 md:px-8">
-        <div className="mb-4 flex items-baseline justify-between">
-          <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-3">Familia · perfiles distintos, una misma estructura</span>
-          <span className="font-mono text-[11px] text-ink-3">{profiles.length} sellos</span>
+        <div className="mb-2 flex items-baseline justify-between">
+          <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-3">Recorrido sensorial · todo lo medido</span>
+          <span className="font-mono text-[11px] text-ink-3">{profiles.length} espacios</span>
         </div>
-        <div className="flex flex-wrap gap-3">
-          {profiles.map((p) => {
-            const active = p.id === selectedId;
-            return (
-              <button
-                key={p.id}
-                type="button"
-                onClick={() => setSelectedId(p.id)}
-                title={`${p.code} · ${p.name}`}
-                className={cx(
-                  "flex flex-col items-center gap-1.5 rounded-md border p-3 transition duration-150 ease-out active:scale-[0.97]",
-                  active ? "border-ink bg-sunken" : "border-line bg-paper hover:border-line-strong",
-                )}
-              >
-                <div className="h-[96px] w-[96px]">
-                  <SensorSeal profile={p} colorMode={colorMode} complexity={complexity} />
-                </div>
-                <span className="font-mono text-[10px] text-ink-3">{p.code}</span>
-                <span className="max-w-[96px] truncate text-[11px] font-medium text-ink">{p.name}</span>
-              </button>
-            );
-          })}
-        </div>
+        <p className="mb-5 max-w-[72ch] text-[13px] leading-relaxed text-ink-2">
+          La experiencia de extremo a extremo: cómo evoluciona cada categoría a lo largo de los
+          espacios medidos de cada sitio. Profundiza el análisis más allá de un solo sello.
+        </p>
+        <Recorrido profiles={profiles} />
       </section>
     </div>
   );

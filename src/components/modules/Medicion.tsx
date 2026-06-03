@@ -52,7 +52,7 @@ export function Medicion({
   return (
     <div className="flex flex-col">
       <header className="border-b border-line px-5 py-6 md:px-8 md:py-7">
-        <Eyebrow>05 · Medición</Eyebrow>
+        <Eyebrow>03 · Medición</Eyebrow>
         <h1 className="mt-2 text-[26px] font-bold leading-[1.1] tracking-tight text-ink md:text-[30px]">
           Medir la zona con sensores
         </h1>
