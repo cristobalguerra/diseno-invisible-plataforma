@@ -11,6 +11,8 @@ const VARS = [
   "--color-line", "--color-line-strong",
   "--color-paper", "--color-canvas", "--color-sunken",
   "--color-accent", "--color-accent-weak", "--color-accent-ink",
+  "--color-cat-sound", "--color-cat-light", "--color-cat-flow", "--color-cat-wait",
+  "--color-cat-orientation", "--color-cat-visual", "--color-cat-pause",
 ];
 
 function cssVarsBlock(): string {

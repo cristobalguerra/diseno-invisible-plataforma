@@ -147,3 +147,18 @@ export const SEVERITY_BG: Record<Severity, string> = {
   1: "var(--color-mid-bg)",
   2: "var(--color-high-bg)",
 };
+
+/**
+ * Color por CATEGORÍA (codificación sensorial, no semafórica). El color codifica
+ * QUÉ categoría es, no su severidad. Es apoyo secundario: el sistema se lee sin
+ * color por forma, cantidad y posición.
+ */
+export const CATEGORY_COLOR: Record<CategoryId, string> = {
+  sound: "var(--color-cat-sound)",
+  light: "var(--color-cat-light)",
+  flow: "var(--color-cat-flow)",
+  wait: "var(--color-cat-wait)",
+  orientation: "var(--color-cat-orientation)",
+  visual: "var(--color-cat-visual)",
+  pause: "var(--color-cat-pause)",
+};

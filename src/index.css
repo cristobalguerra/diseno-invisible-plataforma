@@ -6,26 +6,37 @@
    e indicadores de prioridad, siempre con redundancia (forma + texto).
 ---------------------------------------------------------------------------- */
 @theme {
-  --color-canvas: oklch(0.972 0.004 255);
-  --color-paper: oklch(0.995 0.0025 255);
-  --color-sunken: oklch(0.945 0.006 255);
-  --color-line: oklch(0.86 0.008 255);
-  --color-line-strong: oklch(0.74 0.012 255);
+  /* Base neutra cálida (papel/ficha técnica), no clínica. */
+  --color-canvas: #f4f1ea; /* fondo / papel cálido */
+  --color-paper: #fbf9f3; /* superficie de tarjeta (cálida, casi blanca) */
+  --color-sunken: #e7e1d5; /* recesos suaves y hover */
+  --color-line: #d9d5cc; /* gris niebla — retículas, divisiones, hairlines */
+  --color-line-strong: #b3ac9f; /* bordes con énfasis */
 
-  --color-ink: oklch(0.21 0.021 262);
-  --color-ink-2: oklch(0.38 0.018 262);
-  --color-ink-3: oklch(0.5 0.015 262);
+  --color-ink: #161a1d; /* negro grafito — texto, códigos, líneas */
+  --color-ink-2: #3c4145; /* texto secundario */
+  --color-ink-3: #6f7478; /* gris mineral — datos no prioritarios, guías */
 
-  --color-accent: oklch(0.48 0.16 258);
-  --color-accent-ink: oklch(0.99 0.01 258);
-  --color-accent-weak: oklch(0.93 0.035 258);
+  --color-accent: #234e70; /* azul profundo (estructural) para cromo de UI */
+  --color-accent-ink: #fbf9f3;
+  --color-accent-weak: #dde3e9;
 
-  --color-low: oklch(0.55 0.13 155);
-  --color-low-bg: oklch(0.95 0.03 155);
-  --color-mid: oklch(0.62 0.13 66);
-  --color-mid-bg: oklch(0.95 0.045 80);
-  --color-high: oklch(0.55 0.2 28);
-  --color-high-bg: oklch(0.95 0.04 28);
+  /* Codificación sensorial por CATEGORÍA (asociaciones perceptivas, no literales) */
+  --color-cat-sound: #5a3e85; /* violeta profundo */
+  --color-cat-light: #e8c547; /* amarillo ácido controlado */
+  --color-cat-flow: #287c8e; /* azul cian técnico */
+  --color-cat-wait: #c46a3a; /* naranja terracota */
+  --color-cat-orientation: #234e70; /* azul profundo */
+  --color-cat-visual: #a23e68; /* magenta oscuro */
+  --color-cat-pause: #7a9a76; /* verde salvia */
+
+  /* Semáforo de SEVERIDAD (eje distinto a la categoría) — solo módulos operativos */
+  --color-low: oklch(0.55 0.1 155);
+  --color-low-bg: oklch(0.93 0.025 150);
+  --color-mid: oklch(0.64 0.12 66);
+  --color-mid-bg: oklch(0.93 0.04 80);
+  --color-high: oklch(0.55 0.19 28);
+  --color-high-bg: oklch(0.93 0.035 30);
 
   --font-sans: "Inter", system-ui, -apple-system, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", monospace;
@@ -78,6 +89,11 @@
   /* tabular numbers for technical readouts */
   .tnum {
     font-variant-numeric: tabular-nums;
+  }
+
+  /* monospace inside SVG <text> (matches the export <style> injection) */
+  .mono {
+    font-family: var(--font-mono);
   }
 }
 
