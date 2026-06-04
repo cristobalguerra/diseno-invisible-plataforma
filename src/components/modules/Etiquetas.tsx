@@ -9,7 +9,7 @@ import { profileSheet } from "../../lib/labels/sheet";
 import { downloadPng, downloadSvg } from "../../lib/export";
 import { Button, Eyebrow, Segmented, cx } from "../ui/kit";
 import { SealLegend, SensorSeal } from "../labels/SensorSeal";
-import { Recorrido } from "../labels/Recorrido";
+import { JourneyMap } from "../labels/JourneyMap";
 
 const PARAMS: { key: keyof CategoryParams; label: string }[] = [
   { key: "intensity", label: "Intensidad promedio" },
@@ -76,7 +76,7 @@ export function Etiquetas({
         <section className="flex flex-col gap-5">
           <div className="flex flex-col items-center gap-3 rounded-md border border-line bg-sunken p-6">
             <div className="w-full max-w-[360px]" style={{ aspectRatio: "1 / 1" }}>
-              <SensorSeal ref={sealRef} profile={profile} />
+              <SensorSeal ref={sealRef} profile={profile} animateIn />
             </div>
             <div className="flex w-full items-baseline justify-between border-t border-line pt-3">
               <div className="min-w-0">
@@ -231,17 +231,18 @@ export function Etiquetas({
         </aside>
       </div>
 
-      {/* recorrido sensorial — el mapa, integrado: la experiencia de todo lo medido */}
+      {/* mapa de experiencia — journey emocional del recorrido */}
       <section className="border-t border-line px-5 py-6 md:px-8">
         <div className="mb-2 flex items-baseline justify-between">
-          <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-3">Recorrido sensorial · todo lo medido</span>
+          <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-3">Mapa de experiencia · recorrido emocional</span>
           <span className="font-mono text-[11px] text-ink-3">{profiles.length} espacios</span>
         </div>
         <p className="mb-5 max-w-[72ch] text-[13px] leading-relaxed text-ink-2">
-          La experiencia de extremo a extremo: cómo evoluciona cada categoría a lo largo de los
-          espacios medidos de cada sitio. Profundiza el análisis más allá de un solo sello.
+          La secuencia de espacios de cada sitio como etapas de un recorrido, y cómo se siente la
+          experiencia en cada una: la curva sube hacia la <em>calma</em> y baja hacia la
+          <em> tensión</em> según la carga sensorial, la confusión y el refugio disponible.
         </p>
-        <Recorrido profiles={profiles} />
+        <JourneyMap profiles={profiles} />
       </section>
     </div>
   );

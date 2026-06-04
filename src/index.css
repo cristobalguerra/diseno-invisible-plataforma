@@ -1,49 +1,54 @@
 @import "tailwindcss";
 
 /* ----------------------------------------------------------------------------
-   Diseño invisible — tokens (OKLCH, neutros tintados hacia hue 258)
-   Tema claro de alto contraste. El color semafórico vive solo en pictogramas
-   e indicadores de prioridad, siempre con redundancia (forma + texto).
+   Diseño invisible — tokens. Tema OSCURO tipo dashboard analítico: fondo casi
+   negro, tarjetas flotantes redondeadas, números grandes y acentos vibrantes.
+   Los 7 colores de categoría conservan su matiz, aclarados para resaltar sobre
+   fondo oscuro.
 ---------------------------------------------------------------------------- */
 @theme {
-  /* Base neutra cálida (papel/ficha técnica), no clínica. */
-  --color-canvas: #f4f1ea; /* fondo / papel cálido */
-  --color-paper: #fbf9f3; /* superficie de tarjeta (cálida, casi blanca) */
-  --color-sunken: #e7e1d5; /* recesos suaves y hover */
-  --color-line: #d9d5cc; /* gris niebla — retículas, divisiones, hairlines */
-  --color-line-strong: #b3ac9f; /* bordes con énfasis */
+  /* INSTRUMENTO OSCURO. Neutros tintados hacia el hue de marca (262), nunca
+     negro puro; la profundidad viene de la luminosidad de la superficie, no de
+     sombra. El color saturado está reservado al DATO (las 7 categorías). */
+  --color-sunken: oklch(0.142 0.009 262); /* pozos / insets (lo más profundo) */
+  --color-canvas: oklch(0.176 0.01 262); /* panel base */
+  --color-paper: oklch(0.225 0.012 262); /* superficie elevada */
+  --color-line: oklch(0.305 0.012 262); /* regla de pelo */
+  --color-line-strong: oklch(0.42 0.015 262); /* regla fuerte */
 
-  --color-ink: #161a1d; /* negro grafito — texto, códigos, líneas */
-  --color-ink-2: #3c4145; /* texto secundario */
-  --color-ink-3: #6f7478; /* gris mineral — datos no prioritarios, guías */
+  --color-ink: oklch(0.955 0.006 262); /* texto principal */
+  --color-ink-2: oklch(0.745 0.013 262); /* secundario */
+  --color-ink-3: oklch(0.575 0.013 262); /* etiquetas / mudo */
 
-  --color-accent: #234e70; /* azul profundo (estructural) para cromo de UI */
-  --color-accent-ink: #fbf9f3;
-  --color-accent-weak: #dde3e9;
+  --color-accent: oklch(0.9 0.19 122); /* señal viva del instrumento: foco / live */
+  --color-accent-ink: oklch(0.2 0.02 262);
+  --color-accent-weak: oklch(0.27 0.035 262);
 
-  /* Codificación sensorial por CATEGORÍA (asociaciones perceptivas, no literales) */
-  --color-cat-sound: #5a3e85; /* violeta profundo */
-  --color-cat-light: #e8c547; /* amarillo ácido controlado */
-  --color-cat-flow: #287c8e; /* azul cian técnico */
-  --color-cat-wait: #c46a3a; /* naranja terracota */
-  --color-cat-orientation: #234e70; /* azul profundo */
-  --color-cat-visual: #a23e68; /* magenta oscuro */
-  --color-cat-pause: #7a9a76; /* verde salvia */
+  /* COLOR = DATO. Codificación sensorial por categoría: única fuente de color
+     saturado, la lectura luminosa del instrumento. */
+  --color-cat-sound: #b79cff; /* violeta */
+  --color-cat-light: #ffe974; /* amarillo */
+  --color-cat-flow: #5bd1e6; /* cian */
+  --color-cat-wait: #ff8a4c; /* naranja */
+  --color-cat-orientation: #8fafef; /* azul */
+  --color-cat-visual: #ff6ba3; /* magenta */
+  --color-cat-pause: #a6e0a0; /* verde salvia */
 
-  /* Semáforo de SEVERIDAD (eje distinto a la categoría) — solo módulos operativos */
-  --color-low: oklch(0.55 0.1 155);
-  --color-low-bg: oklch(0.93 0.025 150);
-  --color-mid: oklch(0.64 0.12 66);
-  --color-mid-bg: oklch(0.93 0.04 80);
-  --color-high: oklch(0.55 0.19 28);
-  --color-high-bg: oklch(0.93 0.035 30);
+  /* Valencia emocional (journey): brillantes sobre oscuro, con fondo tenue. */
+  --color-low: #5fd98a;
+  --color-low-bg: oklch(0.26 0.05 152);
+  --color-mid: #ffd45c;
+  --color-mid-bg: oklch(0.28 0.05 86);
+  --color-high: #ff6f6f;
+  --color-high-bg: oklch(0.28 0.08 25);
 
   --font-sans: "Inter", system-ui, -apple-system, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", monospace;
 
   --radius-xs: 2px;
-  --radius-sm: 3px;
-  --radius-md: 5px;
+  --radius-sm: 5px;
+  --radius-md: 9px;
+  --radius-lg: 14px;
 
   --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
   /* Stronger than the CSS built-ins; override Tailwind's ease-* utilities. */
@@ -66,6 +71,8 @@
     background-color: var(--color-canvas);
     color: var(--color-ink);
     font-family: var(--font-sans);
+    /* light-on-dark compensa con un toque de tracking + suavizado */
+    letter-spacing: 0.005em;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
   }

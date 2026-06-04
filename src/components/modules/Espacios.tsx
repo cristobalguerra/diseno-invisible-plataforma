@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { ArrowUpRight, Plus } from "lucide-react";
-import { getCategory } from "../../data/catalog";
+import { getCategory, CATEGORY_COLOR } from "../../data/catalog";
 import type { SensorProfile } from "../../lib/labels/types";
 import { RING_ORDER } from "../../lib/labels/types";
 import { globalLoad, newSpace, siteCode } from "../../lib/labels/profiles";
@@ -8,10 +8,10 @@ import { Button, Eyebrow, cx } from "../ui/kit";
 import { SensorSeal } from "../labels/SensorSeal";
 
 /** categoría con mayor intensidad (exigencia dominante del espacio) */
-function dominant(p: SensorProfile): string {
+function dominant(p: SensorProfile) {
   let best = RING_ORDER[0];
   for (const c of RING_ORDER) if (p.params[c].intensity > p.params[best].intensity) best = c;
-  return getCategory(best).name;
+  return best;
 }
 
 /** agrupa los espacios por sitio, conservando el orden de aparición */
@@ -117,26 +117,46 @@ export function Espacios({
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
               {spaces.map((p) => {
                 const active = p.id === selectedId;
+                const dom = dominant(p);
                 return (
                   <button
                     key={p.id}
                     type="button"
                     onClick={() => onOpen(p.id)}
                     className={cx(
-                      "group flex flex-col gap-2 rounded-md border bg-paper p-4 text-left transition duration-200 ease-out hover:border-line-strong active:scale-[0.99]",
-                      active ? "border-ink" : "border-line",
+                      "group flex flex-col overflow-hidden rounded-md border text-left transition duration-200 ease-out active:scale-[0.99]",
+                      active ? "border-line-strong bg-paper" : "border-line bg-paper hover:border-line-strong",
                     )}
                   >
-                    <div className="mx-auto h-[120px] w-[120px]">
-                      <SensorSeal profile={p} />
-                    </div>
-                    <div className="flex items-baseline justify-between">
-                      <span className="font-mono text-[10px] text-ink-3">{p.code}</span>
+                    {/* cabecera mono */}
+                    <div className="flex items-center justify-between px-3.5 pt-3">
+                      <span className="font-mono text-[10px] tracking-[0.08em] text-ink-3">{p.code}</span>
                       <ArrowUpRight size={13} className="text-ink-3 opacity-0 transition-opacity duration-150 group-hover:opacity-100" />
                     </div>
-                    <div className="truncate text-[13px] font-semibold text-ink">{p.name}</div>
-                    <div className="text-[11px] leading-snug text-ink-2">
-                      Carga {Math.round(globalLoad(p) * 100)}% · {dominant(p)}
+                    {/* sello: espécimen luminoso sobre montura */}
+                    <div className="px-3.5 py-2.5">
+                      <div className="flex h-[132px] items-center justify-center overflow-hidden rounded-sm bg-sunken">
+                        <div className="h-[116px] w-[116px] transition-transform duration-300 ease-out group-hover:scale-[1.05]">
+                          <SensorSeal profile={p} />
+                        </div>
+                      </div>
+                    </div>
+                    {/* lectura */}
+                    <div className="border-t border-line px-3.5 py-3">
+                      <div className="truncate text-[13px] font-semibold text-ink">{p.name}</div>
+                      <div className="mt-2 flex items-end justify-between gap-2">
+                        <div>
+                          <div className="font-mono text-[9px] uppercase tracking-[0.12em] text-ink-3">Carga</div>
+                          <div className="tnum font-mono text-[22px] font-semibold leading-none text-ink">
+                            {Math.round(globalLoad(p) * 100)}
+                            <span className="text-[13px] text-ink-3">%</span>
+                          </div>
+                        </div>
+                        <span className="inline-flex items-center gap-1.5 pb-0.5 text-[11px] text-ink-2">
+                          <span className="h-2 w-2 rounded-full" style={{ background: CATEGORY_COLOR[dom] }} aria-hidden />
+                          {getCategory(dom).name}
+                        </span>
+                      </div>
                     </div>
                   </button>
                 );
