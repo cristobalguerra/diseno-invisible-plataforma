@@ -395,32 +395,32 @@ export const EtiquetaSona = forwardRef<SVGSVGElement, { profile: SensorProfile; 
 
         {/* carga sensorial: barra redondeada, la etiqueta por detrás */}
         <g>
-          <clipPath id="cargaClipSona"><rect x="40" y="648" width="620" height="68" rx="20" /></clipPath>
-          <rect x="40" y="648" width="620" height="68" rx="20" fill={tinta} opacity="0.08" />
-          <rect x="40" y="648" width={anchoLleno} height="68" clipPath="url(#cargaClipSona)" fill="url(#barraSona)" />
-          <text x="66" y="689" fill={tinta} style={{ font: `500 18px ${MONO}`, letterSpacing: "0.14em" }}>CARGA SENSORIAL</text>
-          <text x="634" y="693" fill={tinta} textAnchor="end" style={{ font: `300 30px ${SANS}` }}>{`${pctCarga}%`}</text>
+          <clipPath id="cargaClipSona"><rect x="40" y="654" width="620" height="68" rx="20" /></clipPath>
+          <rect x="40" y="654" width="620" height="68" rx="20" fill={tinta} opacity="0.08" />
+          <rect x="40" y="654" width={anchoLleno} height="68" clipPath="url(#cargaClipSona)" fill="url(#barraSona)" />
+          <text x="66" y="695" fill={tinta} style={{ font: `500 18px ${MONO}`, letterSpacing: "0.14em" }}>CARGA SENSORIAL</text>
+          <text x="634" y="699" fill={tinta} textAnchor="end" style={{ font: `300 30px ${SANS}` }}>{`${pctCarga}%`}</text>
         </g>
 
         <line x1="40" y1="752" x2="660" y2="752" stroke={tinta} strokeWidth="1" opacity="0.14" />
 
         {/* medidores en una columna: comparables de un vistazo */}
-        {filas.map((f, i) => metro(f, 40, 790 + i * 44))}
+        {filas.map((f, i) => metro(f, 40, 794 + i * 41))}
 
-        <line x1="40" y1="1080" x2="660" y2="1080" stroke={tinta} strokeWidth="1" opacity="0.14" />
+        <line x1="40" y1="1070" x2="660" y2="1070" stroke={tinta} strokeWidth="1" opacity="0.14" />
 
         {/* NIVEL 3 — qué puedo hacer */}
-        <text x="40" y="1110" fill={tinta} opacity={0.75} style={{ font: `500 16px ${MONO}`, letterSpacing: "0.14em" }}>QUÉ PUEDO HACER</text>
+        <text x="40" y="1106" fill={tinta} opacity={0.75} style={{ font: `500 16px ${MONO}`, letterSpacing: "0.14em" }}>QUÉ PUEDO HACER</text>
         {recomendaciones.map((ln, i) => (
-          <text key={i} x="40" y={1140 + i * 30} fill={tinta} opacity={0.9} style={{ font: `400 24px ${SANS}` }}>{`· ${ln}`}</text>
+          <text key={i} x="40" y={1138 + i * 32} fill={tinta} opacity={0.9} style={{ font: `400 24px ${SANS}` }}>{`· ${ln}`}</text>
         ))}
 
         {/* firma serif */}
-        <text x="350" y="1234" textAnchor="middle" fill="#000000" style={{ font: `italic 400 28px ${SERIF}`, letterSpacing: "0.03em" }}>sona</text>
+        <text x="350" y="1236" textAnchor="middle" fill="#000000" style={{ font: `italic 400 28px ${SERIF}`, letterSpacing: "0.03em" }}>sona</text>
 
         {/* pie */}
-        <text x="40" y="1232" fill={tinta} opacity={0.55} style={{ font: `500 13px ${MONO}`, letterSpacing: "0.1em" }}>SONA · LECTURA DEL LUGAR</text>
-        <text x="660" y="1232" fill={tinta} opacity={0.55} textAnchor="end" style={{ font: `500 13px ${MONO}`, letterSpacing: "0.08em" }}>{`${profile.site.toUpperCase()} · ${profile.code}`}</text>
+        <text x="40" y="1234" fill={tinta} opacity={0.55} style={{ font: `500 13px ${MONO}`, letterSpacing: "0.1em" }}>SONA · LECTURA DEL LUGAR</text>
+        <text x="660" y="1234" fill={tinta} opacity={0.55} textAnchor="end" style={{ font: `500 13px ${MONO}`, letterSpacing: "0.08em" }}>{`${profile.site.toUpperCase()} · ${profile.code}`}</text>
       </svg>
     );
   }
