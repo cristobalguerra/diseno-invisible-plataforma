@@ -138,7 +138,8 @@ function useCompasSona(): number {
   const [beat, setBeat] = useState(0);
   useEffect(() => {
     if (typeof matchMedia !== "undefined" && matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const t = setInterval(() => setBeat((b) => (b + 1) % SCORE.length), 600);
+    /* compás sereno: la palabra respira sin volverse estímulo */
+    const t = setInterval(() => setBeat((b) => (b + 1) % SCORE.length), 1200);
     return () => clearInterval(t);
   }, []);
   return beat;
@@ -172,7 +173,7 @@ export function CieloSona({ profile }: { profile: SensorProfile }) {
         </filter>
       </defs>
       <rect width="700" height="1000" fill="url(#cieloFull)" />
-      <rect width="700" height="1000" filter="url(#granoFull)" opacity="0.3" style={{ mixBlendMode: "overlay" }} />
+      <rect width="700" height="1000" filter="url(#granoFull)" opacity="0.2" style={{ mixBlendMode: "overlay" }} />
     </svg>
   );
 }
@@ -180,9 +181,11 @@ export function CieloSona({ profile }: { profile: SensorProfile }) {
 /* La palabra sona flotante con el nombre del ESTADO SIEMPRE debajo:
    el héroe móvil que viaja del centro a la parte superior. */
 export function tonoProfundo(profile: SensorProfile): string {
+  /* tono de TEXTO sobre el cielo: cerca del oscuro del mood para
+     sostener AA (≥4.5:1) incluso en la franja media del gradiente */
   const lects = lecturasSona(profile);
   const mood = moodDe(lects);
-  return mezclaHex(mood.profOsc, mood.profCl, lects[0]);
+  return mezclaHex(mood.profOsc, mood.profCl, lects[0] * 0.3);
 }
 
 export function PalabraSona({ profile, estadoVisible = true }: { profile: SensorProfile; estadoVisible?: boolean }) {
@@ -193,6 +196,7 @@ export function PalabraSona({ profile, estadoVisible = true }: { profile: Sensor
   const luz = lects[0];
   const claro = mezclaHex(mood.claroB, "#ffffff", luz);
   const profundo = mezclaHex(mood.profOsc, mood.profCl, luz);
+  const tintaCielo = mezclaHex(mood.profOsc, mood.profCl, luz * 0.3);
   const ids = SCORE[beat];
   return (
     <div className="flex flex-col items-center" style={{ gap: 30 }}>
@@ -238,7 +242,7 @@ export function PalabraSona({ profile, estadoVisible = true }: { profile: Sensor
       >
         <span
           style={{
-            color: profundo,
+            color: tintaCielo,
             font: '500 13px "IBM Plex Mono", ui-monospace, monospace',
             letterSpacing: "0.3em",
             textTransform: "uppercase",
@@ -247,7 +251,7 @@ export function PalabraSona({ profile, estadoVisible = true }: { profile: Sensor
         >
           {mood.nombre}
         </span>
-        <span aria-label={`Carga sensorial ${pctCarga}%`} style={{ color: profundo, font: '200 21px "Inter", system-ui, sans-serif' }}>
+        <span aria-label={`Carga sensorial ${pctCarga}%`} style={{ color: tintaCielo, font: '200 21px "Inter", system-ui, sans-serif' }}>
           {`${pctCarga}%`}
         </span>
       </div>
@@ -302,7 +306,7 @@ export const EtiquetaSona = forwardRef<SVGSVGElement, { profile: SensorProfile; 
             height={15}
             rx={7.5}
             fill={c <= f.sev ? mezclaHex(FACTOR_COLOR[f.id], "#FFFFFF", NIVEL_MEZCLA[c]) : tinta}
-            opacity={c <= f.sev ? 1 : 0.08}
+            opacity={c <= f.sev ? 1 : 0.12}
             stroke={c <= f.sev ? mezclaHex(FACTOR_COLOR[f.id], tinta, 0.35) : "none"}
             strokeWidth={c <= f.sev ? 0.75 : 0}
           />

@@ -18,7 +18,7 @@
 
   --color-ink: #1f334f; /* color estructura */
   --color-ink-2: #46617f; /* estructura suavizada */
-  --color-ink-3: #7a8ba0; /* etiquetas / mudo */
+  --color-ink-3: #5f7087; /* etiquetas / mudo (AA 4.6:1 sobre canvas) */
 
   --color-accent: #6f90b5; /* azul (confianza, Heller) */
   --color-accent-ink: #f7f4ee;
