@@ -118,6 +118,20 @@ function partirLineas(texto: string, max: number, lineas: number): string[] {
   return out;
 }
 
+/* Blueprint Sensorial: el color identifica al factor (Eva Heller);
+   la intensidad se comunica con tratamientos de saturación:
+   bajo = +40% blanco · medio = +20% · alto = color base. */
+const FACTOR_COLOR: Record<CategoryId, string> = {
+  sound: "#6F90B5",
+  light: "#D9C67A",
+  flow: "#7E9B83",
+  wait: "#C98A63",
+  orientation: "#6D9FA6",
+  visual: "#9087A8",
+  pause: "#C8C1B2",
+};
+const NIVEL_MEZCLA = [0.4, 0.2, 0];
+
 const MONO = '"IBM Plex Mono", ui-monospace, monospace';
 const SANS = '"Inter", system-ui, sans-serif';
 const SERIF = 'Georgia, "Times New Roman", serif';
@@ -136,8 +150,8 @@ export const EtiquetaSona = forwardRef<SVGSVGElement, { profile: SensorProfile; 
     const luz = lects[0];
     const claro = mezclaHex(mood.claroB, "#ffffff", luz);
     const profundo = mezclaHex(mood.profOsc, mood.profCl, luz);
-    const papel = mezclaHex("#f1f0ea", mood.cielo[3], 0.5);
-    const tinta = "#3d4e60";
+    const papel = "#F7F4EE";        /* fondo del blueprint (fijo) */
+    const tinta = "#1F334F";        /* color estructura */
     const pct = Math.round((lects.reduce((a, b) => a + b, 0) / 7) * 100);
     const sheet = useMemo(() => profileSheet(profile), [profile]);
     const descLineas = partirLineas(sheet.anticipation, 56, 3);
@@ -171,8 +185,10 @@ export const EtiquetaSona = forwardRef<SVGSVGElement, { profile: SensorProfile; 
             width={52}
             height={13}
             rx={6.5}
-            fill={c <= f.sev ? mood.barra[1] : tinta}
-            opacity={c <= f.sev ? 0.95 : 0.1}
+            fill={c <= f.sev ? mezclaHex(FACTOR_COLOR[f.id], "#FFFFFF", NIVEL_MEZCLA[c]) : tinta}
+            opacity={c <= f.sev ? 1 : 0.08}
+            stroke={c <= f.sev ? mezclaHex(FACTOR_COLOR[f.id], tinta, 0.35) : "none"}
+            strokeWidth={c <= f.sev ? 0.75 : 0}
           />
         ))}
       </g>

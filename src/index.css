@@ -6,40 +6,41 @@
    tipográfica fija (rem) con roles semánticos. Ver DESIGN.md.
 ---------------------------------------------------------------------------- */
 @theme {
-  /* LÍNEA SONA. Papel neutro-cálido, tinta casi negra y la familia bruma
-     azul-gris del instrumento SONA; el color saturado se silencia a las
-     familias de la etiqueta. Museo entre semana a las 9 am. */
-  --color-sunken: #e7e6e0; /* pozos / insets */
-  --color-canvas: #f1f0ea; /* papel base (el papel de la etiqueta) */
-  --color-paper: #f8f7f2; /* superficie elevada */
-  --color-line: #dbdad3; /* regla de pelo */
-  --color-line-strong: #c2c1b9; /* regla fuerte */
+  /* BLUEPRINT SENSORIAL v2 (identidad oficial del proyecto).
+     Psicología del color de Eva Heller adaptada a accesibilidad
+     sensorial: fondo papel #F7F4EE, estructura #1F334F, y cada
+     factor con su color psicológico desaturado. */
+  --color-sunken: #eeeade; /* pozos / insets */
+  --color-canvas: #f7f4ee; /* fondo del blueprint */
+  --color-paper: #fcfaf4; /* superficie elevada */
+  --color-line: #e1dccf; /* regla de pelo */
+  --color-line-strong: #c6c0af; /* regla fuerte */
 
-  --color-ink: #1e2126; /* tinta */
-  --color-ink-2: #3d4e60; /* bruma profunda (la tinta del logo SONA) */
-  --color-ink-3: #75808c; /* etiquetas / mudo */
+  --color-ink: #1f334f; /* color estructura */
+  --color-ink-2: #46617f; /* estructura suavizada */
+  --color-ink-3: #7a8ba0; /* etiquetas / mudo */
 
-  --color-accent: #6b84a0; /* acento bruma */
-  --color-accent-ink: #f1f0ea;
-  --color-accent-weak: #e0e5e9;
+  --color-accent: #6f90b5; /* azul (confianza, Heller) */
+  --color-accent-ink: #f7f4ee;
+  --color-accent-weak: #e3eaf2;
 
-  /* COLOR = DATO, silenciado a la línea SONA: mismas identidades de hue,
-     saturación de museo. */
-  --color-cat-sound: #8579b3; /* violeta bruma */
-  --color-cat-light: #a8946a; /* ámbar (Activo) */
-  --color-cat-flow: #6f9a9b; /* teal (Ajetreado) */
-  --color-cat-wait: #a07868; /* terracota (Concurrido) */
-  --color-cat-orientation: #7d93ab; /* azul bruma (Calmado) */
-  --color-cat-visual: #a5798d; /* magenta silenciado */
-  --color-cat-pause: #7fa08c; /* verde salvia (Equilibrado) */
+  /* COLOR = FACTOR. Selección cromática del blueprint (fundamento
+     Eva Heller): el color identifica al factor sensorial. */
+  --color-cat-sound: #6f90b5; /* azul · silencio, calma */
+  --color-cat-light: #d9c67a; /* amarillo · claridad */
+  --color-cat-flow: #7e9b83; /* verde · recorrido */
+  --color-cat-wait: #c98a63; /* naranja · tiempo activo */
+  --color-cat-orientation: #6d9fa6; /* turquesa · guía */
+  --color-cat-visual: #9087a8; /* morado · riqueza visual */
+  --color-cat-pause: #c8c1b2; /* beige arena · descanso */
 
-  /* Valencia emocional (journey) sobre papel. */
-  --color-low: #7fa08c;
-  --color-low-bg: #e2e8df;
-  --color-mid: #a8946a;
-  --color-mid-bg: #ece5d2;
-  --color-high: #a0685c;
-  --color-high-bg: #ecdcd5;
+  /* Valencia emocional (journey) con la misma familia del blueprint. */
+  --color-low: #7e9b83;
+  --color-low-bg: #e5e9e1;
+  --color-mid: #d9c67a;
+  --color-mid-bg: #f2ecd9;
+  --color-high: #c98a63;
+  --color-high-bg: #f0e2d7;
 
   --font-sans: "Inter", system-ui, -apple-system, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", monospace;
