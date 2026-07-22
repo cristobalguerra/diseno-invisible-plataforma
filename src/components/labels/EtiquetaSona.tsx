@@ -477,8 +477,8 @@ export const EtiquetaSona = forwardRef<SVGSVGElement, { profile: SensorProfile; 
         <text x="350" y="1288" textAnchor="middle" fill="#000000" style={{ font: `italic 400 28px ${SERIF}`, letterSpacing: "0.03em" }}>sona</text>
 
         {/* pie */}
-        <text x="40" y="1286" fill={tinta} opacity={0.55} style={{ font: `500 13px ${MONO}`, letterSpacing: "0.1em" }}>SONA · LECTURA DEL LUGAR</text>
-        <text x="660" y="1286" fill={tinta} opacity={0.55} textAnchor="end" style={{ font: `500 13px ${MONO}`, letterSpacing: "0.08em" }}>{`${profile.site.toUpperCase()} · ${profile.code}`}</text>
+        <text x="40" y="1286" fill={tinta} opacity={0.55} style={{ font: `500 13px ${MONO}`, letterSpacing: "0.1em" }}>BIENESTAR SENSORIAL</text>
+        <text x="660" y="1286" fill={tinta} opacity={0.55} textAnchor="end" style={{ font: `500 13px ${MONO}`, letterSpacing: "0.08em" }}>ANTICIPA TU ENTORNO</text>
       </svg>
     );
   }
