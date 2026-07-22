@@ -30,6 +30,9 @@ const MAPPING: [string, string][] = [
 
 const SOURCES: DataSource[] = ["sensor", "observation", "survey"];
 
+/** Dirección pública canónica de la plataforma (GitHub Pages). */
+const BASE_PUBLICA = "https://cristobalguerra.github.io/diseno-invisible-plataforma/";
+
 export function Etiquetas({
   profiles,
   onProfilesChange,
@@ -62,8 +65,11 @@ export function Etiquetas({
   }
 
   const fname = `etiqueta-${profile.code}`;
-  /* liga pública de este espacio: el destino del NFC y del QR de la señalética */
-  const liga = `${window.location.origin}${window.location.pathname}#/e/${encodeURIComponent(profile.code)}`;
+  /* liga pública de este espacio: el destino del NFC y del QR de la
+     señalética. SIEMPRE apunta al sitio publicado — nunca a la sesión
+     local del administrador — para que lo impreso funcione en
+     cualquier celular. */
+  const liga = `${BASE_PUBLICA}#/e/${encodeURIComponent(profile.code)}`;
   const qrRef = useRef<HTMLCanvasElement>(null);
   const [copiada, setCopiada] = useState(false);
   useEffect(() => {
