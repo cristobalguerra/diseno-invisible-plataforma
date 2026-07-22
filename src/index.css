@@ -6,26 +6,6 @@
    tipográfica fija (rem) con roles semánticos. Ver DESIGN.md.
 ---------------------------------------------------------------------------- */
 
-/* llenado de la barra de carga sensorial: el TIEMPO también comunica.
-   La duración se fija inline según el porcentaje (carga baja = llenado
-   sereno; carga alta = más ágil). Solo transform/opacity. */
-@keyframes llenado-sona {
-  0% { transform: scaleX(0); opacity: 1; }
-  58% { transform: scaleX(1); opacity: 1; }
-  82% { transform: scaleX(1); opacity: 1; }
-  94% { transform: scaleX(1); opacity: 0; }
-  95% { transform: scaleX(0); opacity: 0; }
-  100% { transform: scaleX(0); opacity: 1; }
-}
-.llenado-sona {
-  transform-box: fill-box;
-  transform-origin: left center;
-  animation: llenado-sona 5s cubic-bezier(0.22, 0.7, 0.3, 1) infinite;
-}
-@media (prefers-reduced-motion: reduce) {
-  .llenado-sona { animation: none; }
-}
-
 @theme {
   /* BLUEPRINT SENSORIAL v2 (identidad oficial del proyecto).
      Psicología del color de Eva Heller adaptada a accesibilidad

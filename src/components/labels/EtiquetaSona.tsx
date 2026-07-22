@@ -272,8 +272,11 @@ export const EtiquetaSona = forwardRef<SVGSVGElement, { profile: SensorProfile; 
     const tinta = "#1F334F";        /* color estructura */
     const sheet = useMemo(() => profileSheet(profile), [profile]);
     const pctCarga = Math.round(sheet.load * 100);
-    /* la velocidad del llenado comunica la carga: baja = sereno, alta = ágil */
+    /* el flujo recorre lo lleno en bucle: la carga siempre es visible
+       hasta su marca y el ritmo del viaje comunica el nivel */
     const durLlenado = (7 - 4.5 * (pctCarga / 100)).toFixed(2);
+    const anchoLleno = 620 * (pctCarga / 100);
+    const sinMovimiento = typeof matchMedia !== "undefined" && matchMedia("(prefers-reduced-motion: reduce)").matches;
     const interpretacion = INTERPRETACION[mood.id] ?? [];
     /* NIVEL 3 — recomendaciones accionables: primero las dimensiones
        más exigentes; si todo está bajo, el espacio simplemente recibe */
@@ -337,6 +340,11 @@ export const EtiquetaSona = forwardRef<SVGSVGElement, { profile: SensorProfile; 
             <stop offset="0" stopColor={mood.barra[0]} />
             <stop offset="1" stopColor={mood.barra[1]} />
           </linearGradient>
+          <linearGradient id="brilloSona" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0" stopColor="#ffffff" stopOpacity="0" />
+            <stop offset="0.5" stopColor="#ffffff" stopOpacity="0.4" />
+            <stop offset="1" stopColor="#ffffff" stopOpacity="0" />
+          </linearGradient>
           <linearGradient id="metroSona" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0" stopColor={mood.barra[1]} />
             <stop offset="1" stopColor={mood.barra[0]} />
@@ -397,17 +405,23 @@ export const EtiquetaSona = forwardRef<SVGSVGElement, { profile: SensorProfile; 
         {/* carga sensorial: barra redondeada al doble, la etiqueta por detrás */}
         <g>
           <clipPath id="cargaClipSona"><rect x="40" y="622" width="620" height="68" rx="20" /></clipPath>
+          <clipPath id="cargaFillSona"><rect x="40" y="622" width={anchoLleno} height="68" rx="20" /></clipPath>
           <rect x="40" y="622" width="620" height="68" rx="20" fill={tinta} opacity="0.08" />
-          <rect
-            className="llenado-sona"
-            x="40"
-            y="622"
-            width={620 * (pctCarga / 100)}
-            height="68"
-            clipPath="url(#cargaClipSona)"
-            fill="url(#barraSona)"
-            style={{ animationDuration: `${durLlenado}s` }}
-          />
+          <rect x="40" y="622" width={anchoLleno} height="68" clipPath="url(#cargaClipSona)" fill="url(#barraSona)" />
+          {!sinMovimiento && (
+            <g clipPath="url(#cargaFillSona)">
+              <rect x={-150} y="622" width="150" height="68" fill="url(#brilloSona)">
+                <animateTransform
+                  attributeName="transform"
+                  type="translate"
+                  from="40 0"
+                  to={`${40 + anchoLleno + 150} 0`}
+                  dur={`${durLlenado}s`}
+                  repeatCount="indefinite"
+                />
+              </rect>
+            </g>
+          )}
           <text x="66" y="663" fill={tinta} style={{ font: `500 12px ${MONO}`, letterSpacing: "0.16em" }}>CARGA SENSORIAL</text>
           <text x="634" y="666" fill={tinta} textAnchor="end" style={{ font: `300 24px ${SANS}` }}>{`${pctCarga}%`}</text>
         </g>
