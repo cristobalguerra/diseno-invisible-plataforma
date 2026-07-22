@@ -4,7 +4,7 @@ import type { CategoryId } from "../../lib/types";
 import { CATEGORIES, CATEGORY_COLOR } from "../../data/catalog";
 import type { CategoryParams, DataSource, SensorProfile } from "../../lib/labels/types";
 import { SOURCE_SHORT } from "../../lib/labels/types";
-import { globalLoad, setParam } from "../../lib/labels/profiles";
+import { globalLoad, newSpace, setParam, siteCode } from "../../lib/labels/profiles";
 import { profileSheet } from "../../lib/labels/sheet";
 import { downloadPng, downloadSvg } from "../../lib/export";
 import { Button, Eyebrow, Segmented, cx } from "../ui/kit";
@@ -41,6 +41,8 @@ export function Etiquetas({
   onSelectId: (id: string) => void;
 }) {
   const [selectedCat, setSelectedCat] = useState<CategoryId>("sound");
+  const [nuevoSitio, setNuevoSitio] = useState("");
+  const [nuevoNombre, setNuevoNombre] = useState("");
   const [tab, setTab] = useState<"datos" | "ficha">("datos");
   const sealRef = useRef<SVGSVGElement>(null);
 
@@ -60,10 +62,21 @@ export function Etiquetas({
 
   const fname = `etiqueta-${profile.code}`;
 
+  function registrarEspacio() {
+    const s = nuevoSitio.trim() || "Sin grupo";
+    const enSitio = profiles.filter((p) => p.site === s).length;
+    const code = `${siteCode(s)}-${String(enSitio + 1).padStart(2, "0")}`;
+    const sp = newSpace(nuevoNombre.trim() || `Espacio ${enSitio + 1}`, code, s);
+    onProfilesChange([...profiles, sp]);
+    setNuevoSitio("");
+    setNuevoNombre("");
+    onSelectId(sp.id);
+  }
+
   return (
     <div className="flex flex-col">
       <header className="border-b border-line px-5 py-6 md:px-8 md:py-7">
-        <Eyebrow>02 · Etiqueta</Eyebrow>
+        <Eyebrow>01 · Etiqueta</Eyebrow>
         <h1 className="mt-2 text-display font-bold leading-[1.1] tracking-tight text-ink md:text-display-lg">
           Etiqueta de lectura del lugar
         </h1>
@@ -122,6 +135,27 @@ export function Etiquetas({
         {/* panel derecho: captura del administrador (nivel avanzado) */}
         <aside className="flex flex-col gap-4 rounded-md border border-line bg-paper p-5">
           <div className="font-mono text-micro uppercase tracking-[0.14em] text-ink-3">Captura · administrador</div>
+          <div className="flex flex-wrap items-end gap-2 rounded-sm border border-line bg-sunken p-3">
+            <label className="flex min-w-[110px] flex-1 flex-col gap-1 text-micro text-ink-3">
+              Sitio / edificio
+              <input
+                value={nuevoSitio}
+                onChange={(e) => setNuevoSitio(e.target.value)}
+                placeholder="Museo MARCO…"
+                className="rounded-sm border border-line-strong bg-paper px-2 py-1.5 text-body text-ink focus-visible:border-accent"
+              />
+            </label>
+            <label className="flex min-w-[110px] flex-1 flex-col gap-1 text-micro text-ink-3">
+              Espacio
+              <input
+                value={nuevoNombre}
+                onChange={(e) => setNuevoNombre(e.target.value)}
+                placeholder="Sala, acceso…"
+                className="rounded-sm border border-line-strong bg-paper px-2 py-1.5 text-body text-ink focus-visible:border-accent"
+              />
+            </label>
+            <Button onClick={registrarEspacio}>+ Registrar</Button>
+          </div>
           <div className="inline-flex self-start rounded-sm border border-line-strong bg-canvas p-0.5">
             {(["datos", "ficha"] as const).map((t) => (
               <button

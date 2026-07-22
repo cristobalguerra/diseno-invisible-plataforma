@@ -17,13 +17,12 @@ import {
 } from "./lib/plano/store";
 import { REMOTE_ENABLED, supabase } from "./lib/supabase";
 import { AppShell, type ModuleId } from "./components/shell/AppShell";
-import { Espacios } from "./components/modules/Espacios";
 import { Medicion } from "./components/modules/Medicion";
 import { Etiquetas } from "./components/modules/Etiquetas";
 import { Plano as PlanoModule } from "./components/modules/Plano";
 
 export default function App() {
-  const [module, setModule] = useState<ModuleId>("library");
+  const [module, setModule] = useState<ModuleId>("etiquetas");
   // Repositorio compartido (Supabase si está configurado, localStorage como fallback)
   const [profiles, setProfiles] = useState<SensorProfile[]>(() => loadProfiles());
   const [spaceId, setSpaceId] = useState<string>(() => loadProfiles()[0]?.id ?? "");
@@ -141,17 +140,9 @@ export default function App() {
     prevPlanos.current = planos;
   }, [planos]);
 
-  function openSpace(id: string) {
-    setSpaceId(id);
-    setModule("etiquetas");
-  }
-
   return (
     <AppShell module={module} onModule={setModule}>
       <div key={module} className="module-enter">
-        {module === "library" && (
-          <Espacios profiles={profiles} onProfilesChange={setProfiles} selectedId={spaceId} onOpen={openSpace} />
-        )}
         {module === "etiquetas" && (
           <Etiquetas profiles={profiles} onProfilesChange={setProfiles} selectedId={spaceId} onSelectId={setSpaceId} />
         )}
