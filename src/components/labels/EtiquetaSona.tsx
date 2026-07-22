@@ -134,14 +134,90 @@ const MONO = '"IBM Plex Mono", ui-monospace, monospace';
 const SANS = '"Inter", system-ui, sans-serif';
 const SERIF = 'Georgia, "Times New Roman", serif';
 
-export const EtiquetaSona = forwardRef<SVGSVGElement, { profile: SensorProfile; animateIn?: boolean; plena?: boolean }>(
-  function EtiquetaSona({ profile, plena }, ref) {
-    const [beat, setBeat] = useState(0);
-    useEffect(() => {
-      if (typeof matchMedia !== "undefined" && matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-      const t = setInterval(() => setBeat((b) => (b + 1) % SCORE.length), 600);
-      return () => clearInterval(t);
-    }, []);
+function useCompasSona(): number {
+  const [beat, setBeat] = useState(0);
+  useEffect(() => {
+    if (typeof matchMedia !== "undefined" && matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const t = setInterval(() => setBeat((b) => (b + 1) % SCORE.length), 600);
+    return () => clearInterval(t);
+  }, []);
+  return beat;
+}
+
+/* ============================================================
+   CIELO SONA — capa de apertura del celular: el color del estado
+   a pantalla completa con la palabra "sona" SIEMPRE al centro del
+   espacio. La hoja de lectura desliza por encima.
+   ============================================================ */
+export function CieloSona({ profile }: { profile: SensorProfile }) {
+  const beat = useCompasSona();
+  const lects = useMemo(() => lecturasSona(profile), [profile]);
+  const mood = useMemo(() => moodDe(lects), [lects]);
+  const luz = lects[0];
+  const claro = mezclaHex(mood.claroB, "#ffffff", luz);
+  const profundo = mezclaHex(mood.profOsc, mood.profCl, luz);
+  const ids = SCORE[beat];
+  const oy = 500 - 100 * ESC;
+  return (
+    <svg
+      viewBox="0 0 700 1000"
+      preserveAspectRatio="xMidYMid slice"
+      aria-hidden
+      style={{ width: "100%", height: "100%", display: "block" }}
+    >
+      <defs>
+        <linearGradient id="cieloFull" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor={mood.cielo[0]} />
+          <stop offset="0.45" stopColor={mood.cielo[1]} />
+          <stop offset="0.78" stopColor={mood.cielo[2]} />
+          <stop offset="1" stopColor={mood.cielo[3]} />
+        </linearGradient>
+        <filter id="vidrioFull" x="-20%" y="-30%" width="140%" height="170%">
+          <feOffset in="SourceAlpha" dy="5" result="dAbajo" />
+          <feComposite in="SourceAlpha" in2="dAbajo" operator="out" result="crestaLuz" />
+          <feGaussianBlur in="crestaLuz" stdDeviation="2.2" result="crestaLuzB" />
+          <feFlood floodColor={mezclaHex(claro, "#ffffff", 0.75)} floodOpacity="0.42" />
+          <feComposite in2="crestaLuzB" operator="in" result="luz" />
+          <feOffset in="SourceAlpha" dy="-5" result="dArriba" />
+          <feComposite in="SourceAlpha" in2="dArriba" operator="out" result="crestaSom" />
+          <feGaussianBlur in="crestaSom" stdDeviation="2.6" result="crestaSomB" />
+          <feFlood floodColor={profundo} floodOpacity="0.28" />
+          <feComposite in2="crestaSomB" operator="in" result="som" />
+          <feFlood floodColor={claro} floodOpacity="0.06" />
+          <feComposite in2="SourceAlpha" operator="in" result="cuerpo" />
+          <feMerge>
+            <feMergeNode in="cuerpo" />
+            <feMergeNode in="som" />
+            <feMergeNode in="luz" />
+          </feMerge>
+        </filter>
+        <filter id="somPalFull" x="-30%" y="-40%" width="160%" height="200%">
+          <feGaussianBlur stdDeviation="6" />
+        </filter>
+        <filter id="granoFull">
+          <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" stitchTiles="stitch" />
+          <feColorMatrix values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.5 0" />
+        </filter>
+      </defs>
+      <rect width="700" height="1000" fill="url(#cieloFull)" />
+      <g transform="translate(0 13)" filter="url(#somPalFull)" opacity="0.16" fill={profundo}>
+        {ids.map((id, i) => (
+          <path key={`s${i}`} transform={`translate(${(PAL_OX + XS[i] * ESC).toFixed(1)} ${oy.toFixed(1)}) scale(${ESC.toFixed(4)})`} d={BIB_PATHS[id]} />
+        ))}
+      </g>
+      <g filter="url(#vidrioFull)">
+        {ids.map((id, i) => (
+          <path key={`v${i}`} transform={`translate(${(PAL_OX + XS[i] * ESC).toFixed(1)} ${oy.toFixed(1)}) scale(${ESC.toFixed(4)})`} d={BIB_PATHS[id]} />
+        ))}
+      </g>
+      <rect width="700" height="1000" filter="url(#granoFull)" opacity="0.3" style={{ mixBlendMode: "overlay" }} />
+    </svg>
+  );
+}
+
+export const EtiquetaSona = forwardRef<SVGSVGElement, { profile: SensorProfile; animateIn?: boolean; plena?: boolean; hoja?: boolean }>(
+  function EtiquetaSona({ profile, plena, hoja }, ref) {
+    const beat = useCompasSona();
 
     const lects = useMemo(() => lecturasSona(profile), [profile]);
     const mood = useMemo(() => moodDe(lects), [lects]);
@@ -200,7 +276,7 @@ export const EtiquetaSona = forwardRef<SVGSVGElement, { profile: SensorProfile; 
     return (
       <svg
         ref={ref}
-        viewBox="0 0 700 1244"
+        viewBox={hoja ? "0 400 700 844" : "0 0 700 1244"}
         role="img"
         aria-label={`Etiqueta SONA de ${profile.name}`}
         style={plena
