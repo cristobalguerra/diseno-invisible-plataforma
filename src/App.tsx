@@ -19,6 +19,7 @@ import { REMOTE_ENABLED, supabase } from "./lib/supabase";
 import { AppShell, type ModuleId } from "./components/shell/AppShell";
 import { Medicion } from "./components/modules/Medicion";
 import { Etiquetas } from "./components/modules/Etiquetas";
+import { FichaPublica } from "./components/labels/FichaPublica";
 import { Plano as PlanoModule } from "./components/modules/Plano";
 
 export default function App() {
@@ -139,6 +140,13 @@ export default function App() {
     void deletePlanosRemote(removed).catch((err) => console.error("[supabase] delete planos:", err));
     prevPlanos.current = planos;
   }, [planos]);
+
+  /* liga pública de la señalética: #/e/CODIGO abre la etiqueta
+     completa del espacio, sin administración */
+  const rutaPublica = /^#\/e\/(.+)$/.exec(window.location.hash);
+  if (rutaPublica) {
+    return <FichaPublica profiles={profiles} code={decodeURIComponent(rutaPublica[1])} />;
+  }
 
   return (
     <AppShell module={module} onModule={setModule}>

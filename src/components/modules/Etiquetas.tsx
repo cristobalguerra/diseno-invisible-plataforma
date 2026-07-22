@@ -1,5 +1,6 @@
-import { useMemo, useRef, useState } from "react";
-import { Download, ScanLine } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Copy, Download, ScanLine } from "lucide-react";
+import QRCode from "qrcode";
 import type { CategoryId } from "../../lib/types";
 import { CATEGORIES, CATEGORY_COLOR } from "../../data/catalog";
 import type { CategoryParams, DataSource, SensorProfile } from "../../lib/labels/types";
@@ -61,6 +62,30 @@ export function Etiquetas({
   }
 
   const fname = `etiqueta-${profile.code}`;
+  /* liga pública de este espacio: el destino del NFC y del QR de la señalética */
+  const liga = `${window.location.origin}${window.location.pathname}#/e/${encodeURIComponent(profile.code)}`;
+  const qrRef = useRef<HTMLCanvasElement>(null);
+  const [copiada, setCopiada] = useState(false);
+  useEffect(() => {
+    if (qrRef.current) {
+      QRCode.toCanvas(qrRef.current, liga, { width: 132, margin: 1, color: { dark: "#1F334F", light: "#F7F4EE" } });
+    }
+  }, [liga]);
+  function copiarLiga() {
+    navigator.clipboard?.writeText(liga).then(() => {
+      setCopiada(true);
+      setTimeout(() => setCopiada(false), 2000);
+    });
+  }
+  function descargarQr() {
+    if (!qrRef.current) return;
+    QRCode.toDataURL(liga, { width: 1024, margin: 2, color: { dark: "#1F334F", light: "#FFFFFF" } }).then((url) => {
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `qr-${profile.code}.png`;
+      a.click();
+    });
+  }
 
   function registrarEspacio() {
     const s = nuevoSitio.trim() || "Sin grupo";
@@ -128,6 +153,28 @@ export function Etiquetas({
             <div className="flex gap-2">
               <Button icon={<Download size={14} />} onClick={() => sealRef.current && downloadSvg(sealRef.current, fname)}>SVG</Button>
               <Button icon={<Download size={14} />} onClick={() => sealRef.current && downloadPng(sealRef.current, fname)}>PNG</Button>
+            </div>
+          </div>
+
+          {/* señalética: la liga pública que abre esta etiqueta */}
+          <div className="flex flex-wrap items-center gap-4 rounded-md border border-line bg-paper p-4">
+            <canvas ref={qrRef} className="h-[132px] w-[132px] shrink-0 rounded-sm border border-line" />
+            <div className="min-w-0 flex-1">
+              <div className="font-mono text-micro uppercase tracking-[0.14em] text-ink-3">Señalética · liga pública</div>
+              <p className="mt-1 text-caption leading-snug text-ink-2">
+                El tap (NFC) o escaneo (QR) de la señalética abre esta etiqueta completa en el
+                celular del visitante.
+              </p>
+              <div className="mt-2 flex flex-wrap items-center gap-2">
+                <input
+                  readOnly
+                  value={liga}
+                  onFocus={(e) => e.currentTarget.select()}
+                  className="min-w-[180px] flex-1 rounded-sm border border-line-strong bg-sunken px-2 py-1.5 font-mono text-eyebrow text-ink"
+                />
+                <Button icon={<Copy size={14} />} onClick={copiarLiga}>{copiada ? "Copiada" : "Copiar"}</Button>
+                <Button icon={<Download size={14} />} onClick={descargarQr}>QR</Button>
+              </div>
             </div>
           </div>
         </section>
