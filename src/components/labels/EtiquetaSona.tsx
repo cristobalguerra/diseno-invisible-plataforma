@@ -134,8 +134,8 @@ const MONO = '"IBM Plex Mono", ui-monospace, monospace';
 const SANS = '"Inter", system-ui, sans-serif';
 const SERIF = 'Georgia, "Times New Roman", serif';
 
-export const EtiquetaSona = forwardRef<SVGSVGElement, { profile: SensorProfile; animateIn?: boolean }>(
-  function EtiquetaSona({ profile }, ref) {
+export const EtiquetaSona = forwardRef<SVGSVGElement, { profile: SensorProfile; animateIn?: boolean; plena?: boolean }>(
+  function EtiquetaSona({ profile, plena }, ref) {
     const [beat, setBeat] = useState(0);
     useEffect(() => {
       if (typeof matchMedia !== "undefined" && matchMedia("(prefers-reduced-motion: reduce)").matches) return;
@@ -198,7 +198,15 @@ export const EtiquetaSona = forwardRef<SVGSVGElement, { profile: SensorProfile; 
     );
 
     return (
-      <svg ref={ref} viewBox="0 0 700 1244" role="img" aria-label={`Etiqueta SONA de ${profile.name}`} style={{ width: "100%", height: "auto", borderRadius: 18, boxShadow: "0 24px 60px rgba(0,0,0,.35)" }}>
+      <svg
+        ref={ref}
+        viewBox="0 0 700 1244"
+        role="img"
+        aria-label={`Etiqueta SONA de ${profile.name}`}
+        style={plena
+          ? { width: "100%", height: "auto", display: "block" }
+          : { width: "100%", height: "auto", borderRadius: 18, boxShadow: "0 24px 60px rgba(0,0,0,.35)" }}
+      >
         <defs>
           <linearGradient id="cieloSona" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0" stopColor={mood.cielo[0]} />
@@ -242,8 +250,8 @@ export const EtiquetaSona = forwardRef<SVGSVGElement, { profile: SensorProfile; 
           </filter>
         </defs>
 
-        <rect width="700" height="1244" rx="26" fill={papel} />
-        <clipPath id="recorteSona"><rect width="700" height="1244" rx="26" /></clipPath>
+        <rect width="700" height="1244" rx={plena ? 0 : 26} fill={papel} />
+        <clipPath id="recorteSona"><rect width="700" height="1244" rx={plena ? 0 : 26} /></clipPath>
         <g clipPath="url(#recorteSona)">
           <rect width="700" height="400" fill="url(#cieloSona)" />
           {/* palabra sona en vidrio líquido, recomponiéndose por compases */}

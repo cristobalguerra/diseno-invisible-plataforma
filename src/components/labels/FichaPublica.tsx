@@ -12,15 +12,10 @@ export function FichaPublica({ profiles, code }: { profiles: SensorProfile[]; co
   const profile = profiles.find((p) => p.code.toLowerCase() === code.toLowerCase());
 
   return (
-    <div className="flex min-h-dvh flex-col items-center bg-canvas px-4 py-6">
-      <div className="w-full max-w-[430px]">
+    <div className="min-h-dvh" style={{ background: "#F7F4EE" }}>
+      <div className="mx-auto w-full max-w-[560px]">
         {profile ? (
-          <>
-            <EtiquetaSona key={profile.id} profile={profile} animateIn />
-            <p className="mt-4 text-center font-mono text-micro uppercase tracking-[0.14em] text-ink-3">
-              SONA · Lectura anticipatoria del lugar
-            </p>
-          </>
+          <EtiquetaSona key={profile.id} profile={profile} animateIn plena />
         ) : (
           <div className="rounded-md border border-line bg-paper p-6 text-center">
             <div className="text-strong font-semibold text-ink">Etiqueta no encontrada</div>
