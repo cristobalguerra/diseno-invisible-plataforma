@@ -1,6 +1,6 @@
 import { forwardRef, useEffect, useMemo, useState } from "react";
 import type { CategoryId } from "../../lib/types";
-import { getCategory } from "../../data/catalog";
+import { SEVERITY_LABEL, getCategory } from "../../data/catalog";
 import type { SensorProfile } from "../../lib/labels/types";
 import { RING_ORDER } from "../../lib/labels/types";
 import { intensitySeverity } from "../../lib/labels/profiles";
@@ -149,20 +149,32 @@ export const EtiquetaSona = forwardRef<SVGSVGElement, { profile: SensorProfile; 
     const filas = RING_ORDER.map((id) => {
       const cat = getCategory(id);
       const sev = intensitySeverity(profile.params[id]?.intensity ?? 0);
-      return { id, nombre: cat.name, palabra: cat.levels[sev].short, marca: profile.params[id]?.intensity ?? 0 };
+      return { id, nombre: cat.name, palabra: SEVERITY_LABEL[sev], sev };
     });
-    const colIzq = filas.slice(0, 4), colDer = filas.slice(4);
 
+    /* fila de lectura: nombre, palabra de nivel (Bajo/Medio/Alto) y
+       medidor DISCRETO de 3 celdas — el nivel se cuenta de un vistazo
+       (cantidad + posición + palabra: nunca solo color) */
     const metro = (f: (typeof filas)[number], x: number, y: number) => (
       <g key={f.id}>
-        <text x={x} y={y + 4} fill={tinta} opacity={0.6} style={{ font: `500 9.5px ${MONO}`, letterSpacing: "0.12em", textTransform: "uppercase" }}>
+        <text x={x} y={y + 4} fill={tinta} opacity={0.75} style={{ font: `500 10.5px ${MONO}`, letterSpacing: "0.12em", textTransform: "uppercase" }}>
           {f.nombre.toUpperCase()}
         </text>
-        <text x={x} y={y + 30} fill={tinta} style={{ font: `300 21px ${SANS}` }}>
+        <text x={x} y={y + 30} fill={tinta} style={{ font: `400 20px ${SANS}` }}>
           {f.palabra}
         </text>
-        <rect x={x + 218} y={y - 6} width={8} height={44} rx={4} fill={`url(#metroSona)`} />
-        <rect x={x + 216.5} y={y - 6 + (1 - f.marca) * 41} width={11} height={2.5} fill={tinta} />
+        {[0, 1, 2].map((c) => (
+          <rect
+            key={c}
+            x={x + 452 + c * 60}
+            y={y + 10}
+            width={52}
+            height={13}
+            rx={6.5}
+            fill={c <= f.sev ? mood.barra[1] : tinta}
+            opacity={c <= f.sev ? 0.95 : 0.1}
+          />
+        ))}
       </g>
     );
 
@@ -246,9 +258,8 @@ export const EtiquetaSona = forwardRef<SVGSVGElement, { profile: SensorProfile; 
 
         <line x1="40" y1="616" x2="660" y2="616" stroke={tinta} strokeWidth="1" opacity="0.14" />
 
-        {/* medidores en dos columnas */}
-        {colIzq.map((f, i) => metro(f, 40, 660 + i * 72))}
-        {colDer.map((f, i) => metro(f, 380, 660 + i * 72))}
+        {/* medidores en una columna: comparables de un vistazo */}
+        {filas.map((f, i) => metro(f, 40, 652 + i * 42))}
 
         <line x1="40" y1="942" x2="660" y2="942" stroke={tinta} strokeWidth="1" opacity="0.14" />
 
