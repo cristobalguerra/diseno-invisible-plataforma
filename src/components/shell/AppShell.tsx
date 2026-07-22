@@ -28,8 +28,14 @@ export function AppShell({
           <BrandMark size={30} />
           <div className="leading-tight">
             <div className="text-strong font-bold tracking-tight text-ink">Diseño invisible</div>
-            <div className="font-mono text-micro uppercase tracking-[0.12em] text-ink-3">Pictogramas</div>
+            <div className="font-mono text-micro uppercase tracking-[0.12em] text-ink-3">Blueprint sensorial</div>
           </div>
+        </div>
+        {/* firma del blueprint: los 7 factores en su selección cromática */}
+        <div className="mx-4 mb-3 flex h-1.5 overflow-hidden rounded-full md:mx-5" aria-hidden>
+          {(["sound", "light", "flow", "wait", "orientation", "visual", "pause"] as const).map((c) => (
+            <span key={c} className="flex-1" style={{ background: `var(--color-cat-${c})` }} />
+          ))}
         </div>
 
         <nav className="flex gap-1 overflow-x-auto px-3 pb-3 md:flex-col md:gap-0.5 md:overflow-visible md:px-3">
