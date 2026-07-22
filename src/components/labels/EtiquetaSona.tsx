@@ -67,7 +67,7 @@ const XS = [0, 220, 440, 660];
 const PAL_W = 860;
 const ESC = Math.min(560 / PAL_W, 0.72) * 0.8;
 const PAL_OX = 350 - (PAL_W * ESC) / 2;
-const PAL_OY = 158 - 100 * ESC;
+const PAL_OY = 200 - 100 * ESC;   /* cielo 0..400, palabra centrada */
 
 function mezclaHex(a: string, b: string, t: number): string {
   const pa = parseInt(a.slice(1), 16), pb = parseInt(b.slice(1), 16);
@@ -167,7 +167,7 @@ export const EtiquetaSona = forwardRef<SVGSVGElement, { profile: SensorProfile; 
     );
 
     return (
-      <svg ref={ref} viewBox="0 0 700 1000" role="img" aria-label={`Etiqueta SONA de ${profile.name}`} style={{ width: "100%", height: "auto", borderRadius: 18, boxShadow: "0 24px 60px rgba(0,0,0,.35)" }}>
+      <svg ref={ref} viewBox="0 0 700 1244" role="img" aria-label={`Etiqueta SONA de ${profile.name}`} style={{ width: "100%", height: "auto", borderRadius: 18, boxShadow: "0 24px 60px rgba(0,0,0,.35)" }}>
         <defs>
           <linearGradient id="cieloSona" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0" stopColor={mood.cielo[0]} />
@@ -211,10 +211,10 @@ export const EtiquetaSona = forwardRef<SVGSVGElement, { profile: SensorProfile; 
           </filter>
         </defs>
 
-        <rect width="700" height="1000" rx="26" fill={papel} />
-        <clipPath id="recorteSona"><rect width="700" height="1000" rx="26" /></clipPath>
+        <rect width="700" height="1244" rx="26" fill={papel} />
+        <clipPath id="recorteSona"><rect width="700" height="1244" rx="26" /></clipPath>
         <g clipPath="url(#recorteSona)">
-          <rect width="700" height="310" fill="url(#cieloSona)" />
+          <rect width="700" height="400" fill="url(#cieloSona)" />
           {/* palabra sona en vidrio líquido, recomponiéndose por compases */}
           <g transform="translate(0 13)" filter="url(#somPalSona)" opacity="0.16" fill={profundo}>
             {ids.map((id, i) => (
@@ -226,54 +226,54 @@ export const EtiquetaSona = forwardRef<SVGSVGElement, { profile: SensorProfile; 
               <path key={`v${i}`} transform={`translate(${(PAL_OX + XS[i] * ESC).toFixed(1)} ${PAL_OY.toFixed(1)}) scale(${ESC.toFixed(4)})`} d={BIB_PATHS[id]} />
             ))}
           </g>
-          <rect width="700" height="310" filter="url(#granoSona)" opacity="0.3" style={{ mixBlendMode: "overlay" }} />
+          <rect width="700" height="400" filter="url(#granoSona)" opacity="0.3" style={{ mixBlendMode: "overlay" }} />
         </g>
 
         {/* cabecera */}
-        <text x="40" y="348" fill={tinta} style={{ font: `500 11px ${MONO}`, letterSpacing: "0.16em" }}>LECTURA DEL LUGAR</text>
-        <text x="660" y="348" fill={tinta} textAnchor="end" style={{ font: `500 11px ${MONO}`, letterSpacing: "0.12em" }}>{fecha}</text>
-        <text x="40" y="372" fill={tinta} opacity={0.6} style={{ font: `500 10px ${MONO}`, letterSpacing: "0.12em" }}>
+        <text x="40" y="446" fill={tinta} style={{ font: `500 11px ${MONO}`, letterSpacing: "0.16em" }}>LECTURA DEL LUGAR</text>
+        <text x="660" y="446" fill={tinta} textAnchor="end" style={{ font: `500 11px ${MONO}`, letterSpacing: "0.12em" }}>{fecha}</text>
+        <text x="40" y="472" fill={tinta} opacity={0.6} style={{ font: `500 10px ${MONO}`, letterSpacing: "0.12em" }}>
           {`${profile.site.toUpperCase()} · ${profile.name.toUpperCase()} · ${profile.code}`}
         </text>
 
         {/* héroe: índice + estado */}
-        <text x="40" y="412" fill={tinta} opacity={0.6} style={{ font: `500 10px ${MONO}`, letterSpacing: "0.14em" }}>ÍNDICE DEL LUGAR</text>
-        <text x="40" y="464" fill={tinta} style={{ font: `200 58px ${SANS}` }}>
+        <text x="40" y="524" fill={tinta} opacity={0.6} style={{ font: `500 10px ${MONO}`, letterSpacing: "0.14em" }}>ÍNDICE DEL LUGAR</text>
+        <text x="40" y="580" fill={tinta} style={{ font: `200 58px ${SANS}` }}>
           {pct}<tspan style={{ font: `300 22px ${SANS}` }} opacity={0.55}>%</tspan>
         </text>
-        <text x="660" y="412" fill={tinta} opacity={0.6} textAnchor="end" style={{ font: `500 10px ${MONO}`, letterSpacing: "0.14em" }}>ESTADO</text>
-        <text x="660" y="452" fill={tinta} textAnchor="end" style={{ font: `300 34px ${SANS}` }}>{mood.nombre}</text>
+        <text x="660" y="524" fill={tinta} opacity={0.6} textAnchor="end" style={{ font: `500 10px ${MONO}`, letterSpacing: "0.14em" }}>ESTADO</text>
+        <text x="660" y="568" fill={tinta} textAnchor="end" style={{ font: `300 34px ${SANS}` }}>{mood.nombre}</text>
 
-        <line x1="40" y1="492" x2="660" y2="492" stroke={tinta} strokeWidth="1" opacity="0.14" />
+        <line x1="40" y1="616" x2="660" y2="616" stroke={tinta} strokeWidth="1" opacity="0.14" />
 
         {/* medidores en dos columnas */}
-        {colIzq.map((f, i) => metro(f, 40, 528 + i * 64))}
-        {colDer.map((f, i) => metro(f, 380, 528 + i * 64))}
+        {colIzq.map((f, i) => metro(f, 40, 660 + i * 72))}
+        {colDer.map((f, i) => metro(f, 380, 660 + i * 72))}
 
-        <line x1="40" y1="790" x2="660" y2="790" stroke={tinta} strokeWidth="1" opacity="0.14" />
+        <line x1="40" y1="942" x2="660" y2="942" stroke={tinta} strokeWidth="1" opacity="0.14" />
 
         {/* descripción anticipatoria */}
-        <text x="40" y="814" fill={tinta} opacity={0.75} style={{ font: `500 9px ${MONO}`, letterSpacing: "0.14em" }}>DESCRIPCIÓN DEL ESPACIO</text>
+        <text x="40" y="972" fill={tinta} opacity={0.75} style={{ font: `500 9px ${MONO}`, letterSpacing: "0.14em" }}>DESCRIPCIÓN DEL ESPACIO</text>
         {descLineas.map((ln, i) => (
-          <text key={i} x="40" y={838 + i * 21} fill={tinta} style={{ font: `400 11.5px ${MONO}` }}>{ln}</text>
+          <text key={i} x="40" y={998 + i * 22} fill={tinta} style={{ font: `400 11.5px ${MONO}` }}>{ln}</text>
         ))}
 
         {/* barra índice */}
         <g>
-          <clipPath id="barraClipSona"><rect x="40" y="898" width="620" height="42" rx="13" /></clipPath>
-          <rect x="40" y="898" width="620" height="42" rx="13" fill="url(#barraSona)" />
-          <rect x={40 + 620 * (pct / 100)} y="898" width={620 * (1 - pct / 100)} height="42" clipPath="url(#barraClipSona)" fill={papel} opacity="0.82" />
-          <text x="54" y="926" fill={tinta} style={{ font: `300 22px ${SANS}` }}>
+          <clipPath id="barraClipSona"><rect x="40" y="1088" width="620" height="42" rx="13" /></clipPath>
+          <rect x="40" y="1088" width="620" height="42" rx="13" fill="url(#barraSona)" />
+          <rect x={40 + 620 * (pct / 100)} y="1088" width={620 * (1 - pct / 100)} height="42" clipPath="url(#barraClipSona)" fill={papel} opacity="0.82" />
+          <text x="54" y="1116" fill={tinta} style={{ font: `300 22px ${SANS}` }}>
             {pct}<tspan style={{ font: `300 11px ${SANS}` }} opacity={0.5}>%</tspan>
           </text>
         </g>
 
         {/* firma serif */}
-        <text x="350" y="972" textAnchor="middle" fill="#000000" style={{ font: `italic 400 26px ${SERIF}`, letterSpacing: "0.03em" }}>sona</text>
+        <text x="350" y="1178" textAnchor="middle" fill="#000000" style={{ font: `italic 400 26px ${SERIF}`, letterSpacing: "0.03em" }}>sona</text>
 
         {/* pie */}
-        <text x="40" y="992" fill={tinta} opacity={0.55} style={{ font: `500 8.5px ${MONO}`, letterSpacing: "0.12em" }}>SONA · LECTURA DEL LUGAR</text>
-        <text x="660" y="992" fill={tinta} opacity={0.55} textAnchor="end" style={{ font: `500 8.5px ${MONO}`, letterSpacing: "0.1em" }}>{firmaTec}</text>
+        <text x="40" y="1218" fill={tinta} opacity={0.55} style={{ font: `500 8.5px ${MONO}`, letterSpacing: "0.12em" }}>SONA · LECTURA DEL LUGAR</text>
+        <text x="660" y="1218" fill={tinta} opacity={0.55} textAnchor="end" style={{ font: `500 8.5px ${MONO}`, letterSpacing: "0.1em" }}>{firmaTec}</text>
       </svg>
     );
   }
