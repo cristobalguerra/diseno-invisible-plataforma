@@ -1,6 +1,6 @@
 import { forwardRef, useEffect, useMemo, useState } from "react";
 import type { CategoryId } from "../../lib/types";
-import { SEVERITY_LABEL, getCategory } from "../../data/catalog";
+import { getCategory } from "../../data/catalog";
 import type { SensorProfile } from "../../lib/labels/types";
 import { RING_ORDER } from "../../lib/labels/types";
 import { intensitySeverity } from "../../lib/labels/profiles";
@@ -150,14 +150,8 @@ function useCompasSona(): number {
    espacio. La hoja de lectura desliza por encima.
    ============================================================ */
 export function CieloSona({ profile }: { profile: SensorProfile }) {
-  const beat = useCompasSona();
   const lects = useMemo(() => lecturasSona(profile), [profile]);
   const mood = useMemo(() => moodDe(lects), [lects]);
-  const luz = lects[0];
-  const claro = mezclaHex(mood.claroB, "#ffffff", luz);
-  const profundo = mezclaHex(mood.profOsc, mood.profCl, luz);
-  const ids = SCORE[beat];
-  const oy = 500 - 100 * ESC;
   return (
     <svg
       viewBox="0 0 700 1000"
@@ -172,46 +166,92 @@ export function CieloSona({ profile }: { profile: SensorProfile }) {
           <stop offset="0.78" stopColor={mood.cielo[2]} />
           <stop offset="1" stopColor={mood.cielo[3]} />
         </linearGradient>
-        <filter id="vidrioFull" x="-20%" y="-30%" width="140%" height="170%">
-          <feOffset in="SourceAlpha" dy="5" result="dAbajo" />
-          <feComposite in="SourceAlpha" in2="dAbajo" operator="out" result="crestaLuz" />
-          <feGaussianBlur in="crestaLuz" stdDeviation="2.2" result="crestaLuzB" />
-          <feFlood floodColor={mezclaHex(claro, "#ffffff", 0.75)} floodOpacity="0.42" />
-          <feComposite in2="crestaLuzB" operator="in" result="luz" />
-          <feOffset in="SourceAlpha" dy="-5" result="dArriba" />
-          <feComposite in="SourceAlpha" in2="dArriba" operator="out" result="crestaSom" />
-          <feGaussianBlur in="crestaSom" stdDeviation="2.6" result="crestaSomB" />
-          <feFlood floodColor={profundo} floodOpacity="0.28" />
-          <feComposite in2="crestaSomB" operator="in" result="som" />
-          <feFlood floodColor={claro} floodOpacity="0.06" />
-          <feComposite in2="SourceAlpha" operator="in" result="cuerpo" />
-          <feMerge>
-            <feMergeNode in="cuerpo" />
-            <feMergeNode in="som" />
-            <feMergeNode in="luz" />
-          </feMerge>
-        </filter>
-        <filter id="somPalFull" x="-30%" y="-40%" width="160%" height="200%">
-          <feGaussianBlur stdDeviation="6" />
-        </filter>
         <filter id="granoFull">
           <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" stitchTiles="stitch" />
           <feColorMatrix values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.5 0" />
         </filter>
       </defs>
       <rect width="700" height="1000" fill="url(#cieloFull)" />
-      <g transform="translate(0 13)" filter="url(#somPalFull)" opacity="0.16" fill={profundo}>
-        {ids.map((id, i) => (
-          <path key={`s${i}`} transform={`translate(${(PAL_OX + XS[i] * ESC).toFixed(1)} ${oy.toFixed(1)}) scale(${ESC.toFixed(4)})`} d={BIB_PATHS[id]} />
-        ))}
-      </g>
-      <g filter="url(#vidrioFull)">
-        {ids.map((id, i) => (
-          <path key={`v${i}`} transform={`translate(${(PAL_OX + XS[i] * ESC).toFixed(1)} ${oy.toFixed(1)}) scale(${ESC.toFixed(4)})`} d={BIB_PATHS[id]} />
-        ))}
-      </g>
       <rect width="700" height="1000" filter="url(#granoFull)" opacity="0.3" style={{ mixBlendMode: "overlay" }} />
     </svg>
+  );
+}
+
+/* La palabra sona flotante con el nombre del ESTADO SIEMPRE debajo:
+   el héroe móvil que viaja del centro a la parte superior. */
+export function tonoProfundo(profile: SensorProfile): string {
+  const lects = lecturasSona(profile);
+  const mood = moodDe(lects);
+  return mezclaHex(mood.profOsc, mood.profCl, lects[0]);
+}
+
+export function PalabraSona({ profile, estadoVisible = true }: { profile: SensorProfile; estadoVisible?: boolean }) {
+  const beat = useCompasSona();
+  const lects = useMemo(() => lecturasSona(profile), [profile]);
+  const mood = useMemo(() => moodDe(lects), [lects]);
+  const pctCarga = useMemo(() => Math.round(profileSheet(profile).load * 100), [profile]);
+  const luz = lects[0];
+  const claro = mezclaHex(mood.claroB, "#ffffff", luz);
+  const profundo = mezclaHex(mood.profOsc, mood.profCl, luz);
+  const ids = SCORE[beat];
+  return (
+    <div className="flex flex-col items-center" style={{ gap: 30 }}>
+      <svg viewBox="-30 -30 920 260" aria-label="sona" style={{ width: "min(74vw, 400px)", display: "block" }}>
+        <defs>
+          <filter id="vidrioFlot" x="-20%" y="-30%" width="140%" height="170%">
+            <feOffset in="SourceAlpha" dy="5" result="dAbajo" />
+            <feComposite in="SourceAlpha" in2="dAbajo" operator="out" result="crestaLuz" />
+            <feGaussianBlur in="crestaLuz" stdDeviation="2.2" result="crestaLuzB" />
+            <feFlood floodColor={mezclaHex(claro, "#ffffff", 0.75)} floodOpacity="0.42" />
+            <feComposite in2="crestaLuzB" operator="in" result="luz" />
+            <feOffset in="SourceAlpha" dy="-5" result="dArriba" />
+            <feComposite in="SourceAlpha" in2="dArriba" operator="out" result="crestaSom" />
+            <feGaussianBlur in="crestaSom" stdDeviation="2.6" result="crestaSomB" />
+            <feFlood floodColor={profundo} floodOpacity="0.28" />
+            <feComposite in2="crestaSomB" operator="in" result="som" />
+            <feFlood floodColor={claro} floodOpacity="0.06" />
+            <feComposite in2="SourceAlpha" operator="in" result="cuerpo" />
+            <feMerge>
+              <feMergeNode in="cuerpo" />
+              <feMergeNode in="som" />
+              <feMergeNode in="luz" />
+            </feMerge>
+          </filter>
+          <filter id="somPalFlot" x="-30%" y="-40%" width="160%" height="200%">
+            <feGaussianBlur stdDeviation="6" />
+          </filter>
+        </defs>
+        <g transform="translate(0 13)" filter="url(#somPalFlot)" opacity="0.16" fill={profundo}>
+          {ids.map((id, i) => (
+            <path key={`s${i}`} transform={`translate(${XS[i]} 0)`} d={BIB_PATHS[id]} />
+          ))}
+        </g>
+        <g filter="url(#vidrioFlot)">
+          {ids.map((id, i) => (
+            <path key={`v${i}`} transform={`translate(${XS[i]} 0)`} d={BIB_PATHS[id]} />
+          ))}
+        </g>
+      </svg>
+      <div
+        className="flex flex-col items-center"
+        style={{ gap: 14, opacity: estadoVisible ? 1 : 0, transition: "opacity 400ms ease" }}
+      >
+        <span
+          style={{
+            color: profundo,
+            font: '500 13px "IBM Plex Mono", ui-monospace, monospace',
+            letterSpacing: "0.3em",
+            textTransform: "uppercase",
+            paddingLeft: "0.3em",
+          }}
+        >
+          {mood.nombre}
+        </span>
+        <span aria-label={`Carga sensorial ${pctCarga}%`} style={{ color: profundo, font: '200 21px "Inter", system-ui, sans-serif' }}>
+          {`${pctCarga}%`}
+        </span>
+      </div>
+    </div>
   );
 }
 
@@ -227,6 +267,7 @@ export const EtiquetaSona = forwardRef<SVGSVGElement, { profile: SensorProfile; 
     const papel = "#F7F4EE";        /* fondo del blueprint (fijo) */
     const tinta = "#1F334F";        /* color estructura */
     const sheet = useMemo(() => profileSheet(profile), [profile]);
+    const pctCarga = Math.round(sheet.load * 100);
     const interpretacion = INTERPRETACION[mood.id] ?? [];
     /* NIVEL 3 — recomendaciones accionables: primero las dimensiones
        más exigentes; si todo está bajo, el espacio simplemente recibe */
@@ -235,35 +276,31 @@ export const EtiquetaSona = forwardRef<SVGSVGElement, { profile: SensorProfile; 
       .map((r) => r.recommendation)
       .filter(Boolean)
       .slice(0, 3);
-    const fecha = new Date().toLocaleDateString("es-MX", { day: "numeric", month: "numeric", year: "numeric" });
     const ids = SCORE[beat];
 
     /* filas de medidores: orden angular canónico, 2 columnas */
     const filas = RING_ORDER.map((id) => {
       const cat = getCategory(id);
       const sev = intensitySeverity(profile.params[id]?.intensity ?? 0);
-      return { id, nombre: cat.name, palabra: SEVERITY_LABEL[sev], sev };
+      return { id, nombre: cat.name, sev };
     });
 
-    /* fila de lectura: nombre, palabra de nivel (Bajo/Medio/Alto) y
-       medidor DISCRETO de 3 celdas — el nivel se cuenta de un vistazo
-       (cantidad + posición + palabra: nunca solo color) */
+    /* fila de UNA línea: nombre a la izquierda y escalera del factor a
+       la derecha — el nivel se lee contando celdas llenas; escribirlo
+       sería redundante */
     const metro = (f: (typeof filas)[number], x: number, y: number) => (
       <g key={f.id}>
-        <text x={x} y={y + 4} fill={tinta} opacity={0.75} style={{ font: `500 10.5px ${MONO}`, letterSpacing: "0.12em", textTransform: "uppercase" }}>
+        <text x={x} y={y} fill={tinta} opacity={0.8} style={{ font: `500 11.5px ${MONO}`, letterSpacing: "0.14em", textTransform: "uppercase" }}>
           {f.nombre.toUpperCase()}
-        </text>
-        <text x={x} y={y + 30} fill={tinta} style={{ font: `400 20px ${SANS}` }}>
-          {f.palabra}
         </text>
         {[0, 1, 2].map((c) => (
           <rect
             key={c}
-            x={x + 452 + c * 60}
-            y={y + 10}
-            width={52}
-            height={13}
-            rx={6.5}
+            x={x + 436 + c * 64}
+            y={y - 13}
+            width={56}
+            height={15}
+            rx={7.5}
             fill={c <= f.sev ? mezclaHex(FACTOR_COLOR[f.id], "#FFFFFF", NIVEL_MEZCLA[c]) : tinta}
             opacity={c <= f.sev ? 1 : 0.08}
             stroke={c <= f.sev ? mezclaHex(FACTOR_COLOR[f.id], tinta, 0.35) : "none"}
@@ -344,37 +381,37 @@ export const EtiquetaSona = forwardRef<SVGSVGElement, { profile: SensorProfile; 
           <rect width="700" height="400" filter="url(#granoSona)" opacity="0.3" style={{ mixBlendMode: "overlay" }} />
         </g>
 
-        {/* cabecera */}
-        <text x="40" y="446" fill={tinta} style={{ font: `500 11px ${MONO}`, letterSpacing: "0.16em" }}>LECTURA DEL LUGAR</text>
-        <text x="660" y="446" fill={tinta} textAnchor="end" style={{ font: `500 11px ${MONO}`, letterSpacing: "0.12em" }}>{fecha}</text>
-        <text x="40" y="472" fill={tinta} opacity={0.6} style={{ font: `500 10px ${MONO}`, letterSpacing: "0.12em" }}>
-          {`${profile.site.toUpperCase()} · ${profile.name.toUpperCase()} · ${profile.code}`}
-        </text>
-
-        {/* NIVEL 1 — primero significado, después datos */}
-        <text x="40" y="524" fill={tinta} opacity={0.6} style={{ font: `500 10px ${MONO}`, letterSpacing: "0.14em" }}>ESTADO</text>
-        <text x="40" y="574" fill={tinta} style={{ font: `300 44px ${SANS}` }}>{mood.nombre}</text>
-        <text x="660" y="524" fill={tinta} opacity={0.6} textAnchor="end" style={{ font: `500 10px ${MONO}`, letterSpacing: "0.14em" }}>CARGA SENSORIAL</text>
-        <text x="660" y="566" fill={tinta} textAnchor="end" style={{ font: `300 26px ${SANS}`, textTransform: "capitalize" }}>{sheet.loadWord}</text>
+        {/* NIVEL 1 — la hoja arranca en el ESTADO */}
+        <text x="40" y="452" fill={tinta} opacity={0.6} style={{ font: `500 10px ${MONO}`, letterSpacing: "0.14em" }}>ESTADO</text>
+        <text x="40" y="502" fill={tinta} style={{ font: `300 44px ${SANS}` }}>{mood.nombre}</text>
         {interpretacion.map((ln, i) => (
-          <text key={i} x="40" y={614 + i * 26} fill={tinta} opacity={0.85} style={{ font: `400 15px ${SANS}` }}>{ln}</text>
+          <text key={i} x="40" y={542 + i * 26} fill={tinta} opacity={0.85} style={{ font: `400 15px ${SANS}` }}>{ln}</text>
         ))}
 
-        <line x1="40" y1="706" x2="660" y2="706" stroke={tinta} strokeWidth="1" opacity="0.14" />
+        {/* carga sensorial: barra redondeada al doble, la etiqueta por detrás */}
+        <g>
+          <clipPath id="cargaClipSona"><rect x="40" y="622" width="620" height="68" rx="20" /></clipPath>
+          <rect x="40" y="622" width="620" height="68" rx="20" fill={tinta} opacity="0.08" />
+          <rect x="40" y="622" width={620 * (pctCarga / 100)} height="68" clipPath="url(#cargaClipSona)" fill="url(#barraSona)" />
+          <text x="66" y="663" fill={tinta} style={{ font: `500 12px ${MONO}`, letterSpacing: "0.16em" }}>CARGA SENSORIAL</text>
+          <text x="634" y="666" fill={tinta} textAnchor="end" style={{ font: `300 24px ${SANS}` }}>{`${pctCarga}%`}</text>
+        </g>
+
+        <line x1="40" y1="726" x2="660" y2="726" stroke={tinta} strokeWidth="1" opacity="0.14" />
 
         {/* medidores en una columna: comparables de un vistazo */}
-        {filas.map((f, i) => metro(f, 40, 736 + i * 42))}
+        {filas.map((f, i) => metro(f, 40, 762 + i * 40))}
 
-        <line x1="40" y1="1024" x2="660" y2="1024" stroke={tinta} strokeWidth="1" opacity="0.14" />
+        <line x1="40" y1="1046" x2="660" y2="1046" stroke={tinta} strokeWidth="1" opacity="0.14" />
 
         {/* NIVEL 3 — qué puedo hacer */}
-        <text x="40" y="1054" fill={tinta} opacity={0.75} style={{ font: `500 9px ${MONO}`, letterSpacing: "0.14em" }}>QUÉ PUEDO HACER</text>
+        <text x="40" y="1080" fill={tinta} opacity={0.75} style={{ font: `500 9.5px ${MONO}`, letterSpacing: "0.14em" }}>QUÉ PUEDO HACER</text>
         {recomendaciones.map((ln, i) => (
-          <text key={i} x="40" y={1082 + i * 26} fill={tinta} opacity={0.9} style={{ font: `400 14px ${SANS}` }}>{`· ${ln}`}</text>
+          <text key={i} x="40" y={1104 + i * 26} fill={tinta} opacity={0.9} style={{ font: `400 15px ${SANS}` }}>{`· ${ln}`}</text>
         ))}
 
         {/* firma serif */}
-        <text x="350" y="1178" textAnchor="middle" fill="#000000" style={{ font: `italic 400 26px ${SERIF}`, letterSpacing: "0.03em" }}>sona</text>
+        <text x="350" y="1198" textAnchor="middle" fill="#000000" style={{ font: `italic 400 26px ${SERIF}`, letterSpacing: "0.03em" }}>sona</text>
 
         {/* pie */}
         <text x="40" y="1218" fill={tinta} opacity={0.55} style={{ font: `500 8.5px ${MONO}`, letterSpacing: "0.12em" }}>SONA · LECTURA DEL LUGAR</text>
