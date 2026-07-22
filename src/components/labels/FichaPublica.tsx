@@ -111,43 +111,47 @@ export function FichaPublica({ profiles, code }: { profiles: SensorProfile[]; co
         </svg>
       </div>
 
-      {/* la hoja como SLIDER: la principal + una dimensión por slide */}
+      {/* la hoja fija; SOLO la caja de dimensiones es slider */}
       <div
-        className="absolute inset-x-0 bottom-0 z-20"
+        className="absolute inset-x-0 bottom-0 z-20 flex justify-center"
         style={{ transform: leyendo ? "translateY(0)" : "translateY(104%)", transition: transicion }}
         onClick={(e) => { if (leyendo) e.stopPropagation(); }}
       >
-        <div
-          ref={carrusel}
-          className="flex snap-x snap-mandatory overflow-x-auto"
-          style={{ scrollbarWidth: "none" }}
-          onScroll={(e) => {
-            const el = e.currentTarget;
-            setSlide(Math.round(el.scrollLeft / el.clientWidth));
-          }}
-        >
-          <div className="flex w-full shrink-0 snap-center justify-center">
-            <div className="overflow-hidden rounded-t-2xl" style={{ width: anchoHoja, height: altoHoja }}>
-              <EtiquetaSona key={profile.id} profile={profile} animateIn plena hoja />
+        <div className="overflow-hidden rounded-t-2xl" style={{ width: anchoHoja, height: altoHoja }}>
+          {/* franja fija superior: estado + interpretación + carga */}
+          <EtiquetaSona key={`a-${profile.id}`} profile={profile} plena recorte="0 400 700 352" />
+          {/* caja deslizable: lista de dimensiones ↔ detalle por dimensión */}
+          <div className="relative">
+            <div
+              ref={carrusel}
+              className="flex snap-x snap-mandatory overflow-x-auto"
+              style={{ scrollbarWidth: "none" }}
+              onScroll={(e) => {
+                const el = e.currentTarget;
+                setSlide(Math.round(el.scrollLeft / el.clientWidth));
+              }}
+            >
+              <div className="w-full shrink-0 snap-center">
+                <EtiquetaSona key={`d-${profile.id}`} profile={profile} plena recorte="0 752 700 318" />
+              </div>
+              {RING_ORDER.map((id) => (
+                <div key={id} className="w-full shrink-0 snap-center">
+                  <DimensionSona profile={profile} id={id} />
+                </div>
+              ))}
+            </div>
+            <div className="pointer-events-none absolute inset-x-0 bottom-1 flex justify-center gap-1.5">
+              {Array.from({ length: 8 }, (_, i) => (
+                <span
+                  key={i}
+                  className="h-1 w-1 rounded-full"
+                  style={{ background: "#1F334F", opacity: i === slide ? 0.5 : 0.14, transition: "opacity 200ms ease" }}
+                />
+              ))}
             </div>
           </div>
-          {RING_ORDER.map((id) => (
-            <div key={id} className="flex w-full shrink-0 snap-center justify-center">
-              <div className="overflow-hidden rounded-t-2xl" style={{ width: anchoHoja, height: altoHoja }}>
-                <DimensionSona profile={profile} id={id} />
-              </div>
-            </div>
-          ))}
-        </div>
-        {/* posición del slider: puntos discretos */}
-        <div className="pointer-events-none absolute inset-x-0 bottom-2 flex justify-center gap-1.5">
-          {Array.from({ length: 8 }, (_, i) => (
-            <span
-              key={i}
-              className="h-1 w-1 rounded-full"
-              style={{ background: "#1F334F", opacity: i === slide ? 0.55 : 0.16, transition: "opacity 200ms ease" }}
-            />
-          ))}
+          {/* franja fija inferior: qué puedo hacer + firma */}
+          <EtiquetaSona key={`b-${profile.id}`} profile={profile} plena recorte="0 1070 700 250" />
         </div>
       </div>
     </div>

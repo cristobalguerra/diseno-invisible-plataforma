@@ -200,45 +200,40 @@ export function CieloSona({ profile }: { profile: SensorProfile }) {
    Mismo lienzo/tipografía que la hoja principal (700×920).
    ============================================================ */
 export function DimensionSona({ profile, id }: { profile: SensorProfile; id: CategoryId }) {
+  /* Detalle compacto de una dimensión: cabe EXACTO en la caja del
+     slider (700×318), con el resto de la hoja fija alrededor. */
   const cat = getCategory(id);
   const sev = intensitySeverity(profile.params[id]?.intensity ?? 0);
   const nivel = cat.levels[sev];
-  const lects = lecturasSona(profile);
-  const mood = moodDe(lects);
-  const papel = "#F7F4EE";
   const tinta = "#1F334F";
-  const significa = partirLineas(nivel.message, 44, 4);
-  const hacer = partirLineas(nivel.decision, 44, 3);
+  const significa = partirLineas(nivel.message, 52, 2);
+  const hacer = partirLineas(nivel.decision, 52, 2);
   return (
-    <svg viewBox="0 400 700 920" role="img" aria-label={`${cat.name}: ${nivel.label}`} style={{ width: "100%", height: "auto", display: "block" }}>
-      <rect y="400" width="700" height="920" fill={papel} />
-      <text x="40" y="444" fill={tinta} opacity={0.6} style={{ font: `500 16px ${MONO}`, letterSpacing: "0.14em" }}>{cat.name.toUpperCase()}</text>
-      <text x="40" y="508" fill={tinta} style={{ font: `300 58px "Inter", system-ui, sans-serif` }}>{nivel.short}</text>
+    <svg viewBox="0 0 700 318" role="img" aria-label={`${cat.name}: ${nivel.label}`} style={{ width: "100%", height: "auto", display: "block" }}>
+      <rect width="700" height="318" fill="#F7F4EE" />
+      <text x="40" y="34" fill={tinta} opacity={0.6} style={{ font: `500 16px ${MONO}`, letterSpacing: "0.14em" }}>{cat.name.toUpperCase()}</text>
+      <text x="40" y="86" fill={tinta} style={{ font: `300 42px "Inter", system-ui, sans-serif` }}>{nivel.short}</text>
       {[0, 1, 2].map((c) => (
         <rect
           key={c}
-          x={40 + c * 110}
-          y={548}
-          width={100}
-          height={30}
-          rx={15}
+          x={460 + c * 70}
+          y={58}
+          width={60}
+          height={19}
+          rx={9.5}
           fill={c <= sev ? mezclaHex(FACTOR_COLOR[id], "#FFFFFF", NIVEL_MEZCLA[c]) : tinta}
           opacity={c <= sev ? 1 : 0.12}
           stroke={c <= sev ? mezclaHex(FACTOR_COLOR[id], tinta, 0.35) : "none"}
           strokeWidth={c <= sev ? 0.75 : 0}
         />
       ))}
-      <text x="40" y="668" fill={tinta} opacity={0.75} style={{ font: `500 16px ${MONO}`, letterSpacing: "0.14em" }}>QUÉ SIGNIFICA</text>
+      <text x="40" y="146" fill={tinta} opacity={0.75} style={{ font: `500 14px ${MONO}`, letterSpacing: "0.14em" }}>QUÉ SIGNIFICA</text>
       {significa.map((ln, i) => (
-        <text key={i} x="40" y={706 + i * 36} fill={tinta} opacity={0.85} style={{ font: `400 24px "Inter", system-ui, sans-serif` }}>{ln}</text>
+        <text key={i} x="40" y={178 + i * 32} fill={tinta} opacity={0.85} style={{ font: `400 22px "Inter", system-ui, sans-serif` }}>{ln}</text>
       ))}
-      <text x="40" y="892" fill={tinta} opacity={0.75} style={{ font: `500 16px ${MONO}`, letterSpacing: "0.14em" }}>QUÉ PUEDO HACER</text>
       {hacer.map((ln, i) => (
-        <text key={i} x="40" y={930 + i * 36} fill={tinta} opacity={0.9} style={{ font: `400 24px "Inter", system-ui, sans-serif` }}>{ln}</text>
+        <text key={`h${i}`} x="40" y={252 + i * 32} fill={tinta} opacity={0.9} style={{ font: `400 22px "Inter", system-ui, sans-serif` }}>{`· ${ln}`}</text>
       ))}
-      <text x="40" y="1286" fill={tinta} opacity={0.55} style={{ font: `500 13px ${MONO}`, letterSpacing: "0.1em" }}>SONA · {mood.nombre.toUpperCase()}</text>
-      <text x="350" y="1288" textAnchor="middle" fill="#000000" style={{ font: `italic 400 28px Georgia, "Times New Roman", serif`, letterSpacing: "0.03em" }}>sona</text>
-      <text x="660" y="1286" fill={tinta} opacity={0.55} textAnchor="end" style={{ font: `500 13px ${MONO}`, letterSpacing: "0.08em" }}>{`${profile.code}`}</text>
     </svg>
   );
 }
@@ -322,8 +317,8 @@ export function PalabraSona({ profile, estadoVisible = true }: { profile: Sensor
   );
 }
 
-export const EtiquetaSona = forwardRef<SVGSVGElement, { profile: SensorProfile; animateIn?: boolean; plena?: boolean; hoja?: boolean }>(
-  function EtiquetaSona({ profile, plena, hoja }, ref) {
+export const EtiquetaSona = forwardRef<SVGSVGElement, { profile: SensorProfile; animateIn?: boolean; plena?: boolean; hoja?: boolean; recorte?: string }>(
+  function EtiquetaSona({ profile, plena, hoja, recorte }, ref) {
     const beat = useCompasSona();
 
     const lects = useMemo(() => lecturasSona(profile), [profile]);
@@ -381,7 +376,7 @@ export const EtiquetaSona = forwardRef<SVGSVGElement, { profile: SensorProfile; 
     return (
       <svg
         ref={ref}
-        viewBox={hoja ? "0 400 700 920" : "0 0 700 1320"}
+        viewBox={recorte ?? (hoja ? "0 400 700 920" : "0 0 700 1320")}
         role="img"
         aria-label={`Etiqueta SONA de ${profile.name}`}
         style={plena
