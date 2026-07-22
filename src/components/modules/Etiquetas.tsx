@@ -9,7 +9,6 @@ import { profileSheet } from "../../lib/labels/sheet";
 import { downloadPng, downloadSvg } from "../../lib/export";
 import { Button, Eyebrow, Segmented, cx } from "../ui/kit";
 import { EtiquetaSona } from "../labels/EtiquetaSona";
-import { JourneyMap } from "../labels/JourneyMap";
 
 const PARAMS: { key: keyof CategoryParams; label: string }[] = [
   { key: "intensity", label: "Intensidad promedio" },
@@ -221,19 +220,6 @@ export function Etiquetas({
         </aside>
       </div>
 
-      {/* mapa de experiencia — journey emocional del recorrido */}
-      <section className="border-t border-line px-5 py-6 md:px-8">
-        <div className="mb-2 flex items-baseline justify-between">
-          <span className="text-eyebrow font-semibold uppercase tracking-[0.08em] text-ink-3">Mapa de experiencia · recorrido emocional</span>
-          <span className="font-mono text-eyebrow text-ink-3">{profiles.length} espacios</span>
-        </div>
-        <p className="mb-5 max-w-[72ch] text-body leading-relaxed text-ink-2">
-          La secuencia de espacios de cada sitio como etapas de un recorrido, y cómo se siente la
-          experiencia en cada una: la curva sube hacia la <em>calma</em> y baja hacia la
-          <em> tensión</em> según la carga sensorial, la confusión y el refugio disponible.
-        </p>
-        <JourneyMap profiles={profiles} />
-      </section>
     </div>
   );
 }
