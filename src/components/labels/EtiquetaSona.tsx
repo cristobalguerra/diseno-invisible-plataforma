@@ -167,7 +167,7 @@ export function CieloSona({ profile }: { profile: SensorProfile }) {
           <stop offset="0.78" stopColor={mood.cielo[2]} />
           <stop offset="1" stopColor={mood.cielo[3]} />
         </linearGradient>
-        <filter id="granoFull">
+        <filter id="granoFull" x="0" y="0" width="100%" height="100%">
           <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" stitchTiles="stitch" />
           <feColorMatrix values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.5 0" />
         </filter>
@@ -361,7 +361,7 @@ export const EtiquetaSona = forwardRef<SVGSVGElement, { profile: SensorProfile; 
           <filter id="somPalSona" x="-30%" y="-40%" width="160%" height="200%">
             <feGaussianBlur stdDeviation="6" />
           </filter>
-          <filter id="granoSona">
+          <filter id="granoSona" x="0" y="0" width="100%" height="100%">
             <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" stitchTiles="stitch" />
             <feColorMatrix values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.5 0" />
           </filter>
