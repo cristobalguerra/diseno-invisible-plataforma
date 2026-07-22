@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
+import { RING_ORDER } from "../../lib/labels/types";
 import type { SensorProfile } from "../../lib/labels/types";
-import { CieloSona, EtiquetaSona, PalabraSona, tonoProfundo } from "./EtiquetaSona";
+import { CieloSona, DimensionSona, EtiquetaSona, PalabraSona, tonoProfundo } from "./EtiquetaSona";
 
 /* ============================================================
    FICHA PÚBLICA — la pantalla que abre el tap en la señalética.
@@ -20,7 +21,10 @@ const HOJA_W = 700, HOJA_H = 920; /* proporción del arte de la hoja */
 export function FichaPublica({ profiles, code }: { profiles: SensorProfile[]; code: string }) {
   const profile = profiles.find((p) => p.code.toLowerCase() === code.toLowerCase());
   const [leyendo, setLeyendo] = useState(false);
+  const [slide, setSlide] = useState(0);
+  const carrusel = useRef<HTMLDivElement>(null);
   const toqueY = useRef<number | null>(null);
+  const toqueX = useRef<number | null>(null);
   const [caja, setCaja] = useState<[number, number]>([0, 0]);
 
   useEffect(() => {
@@ -63,12 +67,16 @@ export function FichaPublica({ profiles, code }: { profiles: SensorProfile[]; co
   }
   function toqueInicio(e: React.TouchEvent) {
     toqueY.current = e.touches[0].clientY;
+    toqueX.current = e.touches[0].clientX;
   }
   function toqueMueve(e: React.TouchEvent) {
-    if (toqueY.current == null) return;
+    if (toqueY.current == null || toqueX.current == null) return;
     const d = e.touches[0].clientY - toqueY.current;
-    if (!leyendo && d < -34) { abrir(); toqueY.current = null; }
-    if (leyendo && d > 46) { cerrar(); toqueY.current = null; }
+    const dx = e.touches[0].clientX - toqueX.current;
+    /* el gesto vertical solo manda si domina sobre el horizontal
+       (el carrusel de dimensiones usa el eje X) */
+    if (!leyendo && d < -34 && Math.abs(d) > Math.abs(dx) * 1.5) { abrir(); toqueY.current = null; }
+    if (leyendo && d > 46 && Math.abs(d) > Math.abs(dx) * 1.5) { cerrar(); toqueY.current = null; }
   }
 
   return (
@@ -103,14 +111,43 @@ export function FichaPublica({ profiles, code }: { profiles: SensorProfile[]; co
         </svg>
       </div>
 
-      {/* la hoja completa, anclada al borde inferior */}
+      {/* la hoja como SLIDER: la principal + una dimensión por slide */}
       <div
-        className="absolute inset-x-0 bottom-0 z-20 flex justify-center"
+        className="absolute inset-x-0 bottom-0 z-20"
         style={{ transform: leyendo ? "translateY(0)" : "translateY(104%)", transition: transicion }}
         onClick={(e) => { if (leyendo) e.stopPropagation(); }}
       >
-        <div className="overflow-hidden rounded-t-2xl" style={{ width: anchoHoja, height: altoHoja }}>
-          <EtiquetaSona key={profile.id} profile={profile} animateIn plena hoja />
+        <div
+          ref={carrusel}
+          className="flex snap-x snap-mandatory overflow-x-auto"
+          style={{ scrollbarWidth: "none" }}
+          onScroll={(e) => {
+            const el = e.currentTarget;
+            setSlide(Math.round(el.scrollLeft / el.clientWidth));
+          }}
+        >
+          <div className="flex w-full shrink-0 snap-center justify-center">
+            <div className="overflow-hidden rounded-t-2xl" style={{ width: anchoHoja, height: altoHoja }}>
+              <EtiquetaSona key={profile.id} profile={profile} animateIn plena hoja />
+            </div>
+          </div>
+          {RING_ORDER.map((id) => (
+            <div key={id} className="flex w-full shrink-0 snap-center justify-center">
+              <div className="overflow-hidden rounded-t-2xl" style={{ width: anchoHoja, height: altoHoja }}>
+                <DimensionSona profile={profile} id={id} />
+              </div>
+            </div>
+          ))}
+        </div>
+        {/* posición del slider: puntos discretos */}
+        <div className="pointer-events-none absolute inset-x-0 bottom-2 flex justify-center gap-1.5">
+          {Array.from({ length: 8 }, (_, i) => (
+            <span
+              key={i}
+              className="h-1 w-1 rounded-full"
+              style={{ background: "#1F334F", opacity: i === slide ? 0.55 : 0.16, transition: "opacity 200ms ease" }}
+            />
+          ))}
         </div>
       </div>
     </div>

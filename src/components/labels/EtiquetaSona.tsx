@@ -130,6 +130,20 @@ const INTERPRETACION: Record<string, string[]> = {
   unstable: ["Estímulos altos y poco predecibles.", "La visita puede resultar demandante.", "Se recomienda visita breve o acompañada."],
 };
 
+function partirLineas(texto: string, max: number, lineas: number): string[] {
+  const out: string[] = [];
+  let linea = "";
+  for (const w of (texto || "").split(/\s+/)) {
+    if ((linea + " " + w).trim().length > max) {
+      out.push(linea.trim());
+      linea = w;
+      if (out.length === lineas - 1) break;
+    } else linea = (linea + " " + w).trim();
+  }
+  if (linea && out.length < lineas) out.push(linea.trim());
+  return out;
+}
+
 const MONO = '"IBM Plex Mono", ui-monospace, monospace';
 const SANS = '"Inter", system-ui, sans-serif';
 const SERIF = 'Georgia, "Times New Roman", serif';
@@ -180,6 +194,55 @@ export function CieloSona({ profile }: { profile: SensorProfile }) {
 
 /* La palabra sona flotante con el nombre del ESTADO SIEMPRE debajo:
    el héroe móvil que viaja del centro a la parte superior. */
+/* ============================================================
+   DIMENSIÓN SONA — slide de detalle de una dimensión: nivel,
+   escalera del factor en grande, qué significa y qué puedo hacer.
+   Mismo lienzo/tipografía que la hoja principal (700×920).
+   ============================================================ */
+export function DimensionSona({ profile, id }: { profile: SensorProfile; id: CategoryId }) {
+  const cat = getCategory(id);
+  const sev = intensitySeverity(profile.params[id]?.intensity ?? 0);
+  const nivel = cat.levels[sev];
+  const lects = lecturasSona(profile);
+  const mood = moodDe(lects);
+  const papel = "#F7F4EE";
+  const tinta = "#1F334F";
+  const significa = partirLineas(nivel.message, 44, 4);
+  const hacer = partirLineas(nivel.decision, 44, 3);
+  return (
+    <svg viewBox="0 400 700 920" role="img" aria-label={`${cat.name}: ${nivel.label}`} style={{ width: "100%", height: "auto", display: "block" }}>
+      <rect y="400" width="700" height="920" fill={papel} />
+      <text x="40" y="444" fill={tinta} opacity={0.6} style={{ font: `500 16px ${MONO}`, letterSpacing: "0.14em" }}>{cat.name.toUpperCase()}</text>
+      <text x="40" y="508" fill={tinta} style={{ font: `300 58px "Inter", system-ui, sans-serif` }}>{nivel.short}</text>
+      {[0, 1, 2].map((c) => (
+        <rect
+          key={c}
+          x={40 + c * 110}
+          y={548}
+          width={100}
+          height={30}
+          rx={15}
+          fill={c <= sev ? mezclaHex(FACTOR_COLOR[id], "#FFFFFF", NIVEL_MEZCLA[c]) : tinta}
+          opacity={c <= sev ? 1 : 0.12}
+          stroke={c <= sev ? mezclaHex(FACTOR_COLOR[id], tinta, 0.35) : "none"}
+          strokeWidth={c <= sev ? 0.75 : 0}
+        />
+      ))}
+      <text x="40" y="668" fill={tinta} opacity={0.75} style={{ font: `500 16px ${MONO}`, letterSpacing: "0.14em" }}>QUÉ SIGNIFICA</text>
+      {significa.map((ln, i) => (
+        <text key={i} x="40" y={706 + i * 36} fill={tinta} opacity={0.85} style={{ font: `400 24px "Inter", system-ui, sans-serif` }}>{ln}</text>
+      ))}
+      <text x="40" y="892" fill={tinta} opacity={0.75} style={{ font: `500 16px ${MONO}`, letterSpacing: "0.14em" }}>QUÉ PUEDO HACER</text>
+      {hacer.map((ln, i) => (
+        <text key={i} x="40" y={930 + i * 36} fill={tinta} opacity={0.9} style={{ font: `400 24px "Inter", system-ui, sans-serif` }}>{ln}</text>
+      ))}
+      <text x="40" y="1286" fill={tinta} opacity={0.55} style={{ font: `500 13px ${MONO}`, letterSpacing: "0.1em" }}>SONA · {mood.nombre.toUpperCase()}</text>
+      <text x="350" y="1288" textAnchor="middle" fill="#000000" style={{ font: `italic 400 28px Georgia, "Times New Roman", serif`, letterSpacing: "0.03em" }}>sona</text>
+      <text x="660" y="1286" fill={tinta} opacity={0.55} textAnchor="end" style={{ font: `500 13px ${MONO}`, letterSpacing: "0.08em" }}>{`${profile.code}`}</text>
+    </svg>
+  );
+}
+
 export function tonoProfundo(profile: SensorProfile): string {
   /* tono de TEXTO sobre el cielo: cerca del oscuro del mood para
      sostener AA (≥4.5:1) incluso en la franja media del gradiente */
