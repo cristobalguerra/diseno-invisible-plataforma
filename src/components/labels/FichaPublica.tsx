@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import type { SensorProfile } from "../../lib/labels/types";
-import { CieloSona, EtiquetaSona, PalabraSona } from "./EtiquetaSona";
+import { CieloSona, EtiquetaSona, PalabraSona, tonoProfundo } from "./EtiquetaSona";
 
 /* ============================================================
    FICHA PÚBLICA — la pantalla que abre el tap en la señalética.
@@ -53,6 +53,7 @@ export function FichaPublica({ profiles, code }: { profiles: SensorProfile[]; co
   const viaje = vh ? -(vh / 2 - cabezal / 2) : 0;
   const transicion = "transform 560ms cubic-bezier(0.3, 0.7, 0.2, 1)";
 
+  const tono = tonoProfundo(profile);
   const abrir = () => setLeyendo(true);
   const cerrar = () => setLeyendo(false);
 
@@ -90,6 +91,16 @@ export function FichaPublica({ profiles, code }: { profiles: SensorProfile[]; co
         style={{ transform: `translateY(${leyendo ? viaje.toFixed(1) : 0}px)`, transition: transicion }}
       >
         <PalabraSona profile={profile} estadoVisible={!leyendo} />
+      </div>
+
+      {/* invitación silenciosa: solo la flecha */}
+      <div
+        className="pointer-events-none absolute inset-x-0 bottom-9 z-30 flex justify-center transition-opacity duration-300"
+        style={{ opacity: leyendo ? 0 : 1 }}
+      >
+        <svg width="18" height="10" viewBox="0 0 18 10" aria-hidden>
+          <path d="M1 9 L9 1 L17 9" fill="none" stroke={tono} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
       </div>
 
       {/* la hoja completa, anclada al borde inferior */}
