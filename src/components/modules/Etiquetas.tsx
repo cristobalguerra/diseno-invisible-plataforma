@@ -68,9 +68,9 @@ export function Etiquetas({
           Etiqueta de lectura del lugar
         </h1>
         <p className="mt-2 max-w-[68ch] text-strong leading-relaxed text-ink-2">
-          La lectura de un espacio se <strong>clasifica en un estado</strong> que tiñe la etiqueta
-          completa: índice, medidores de las siete categorías y descripción anticipatoria. Aquí
-          capturas o corriges los datos medidos y la etiqueta se regenera al instante.
+          Lo que abre el visitante al hacer tap en la señal: <strong>primero significado, después
+          datos</strong>. Estado e interpretación, las siete dimensiones en palabras y qué puede
+          hacer para prepararse. La captura técnica vive en el panel del administrador.
         </p>
       </header>
 
@@ -119,8 +119,9 @@ export function Etiquetas({
           </div>
         </section>
 
-        {/* panel derecho: datos / ficha */}
+        {/* panel derecho: captura del administrador (nivel avanzado) */}
         <aside className="flex flex-col gap-4 rounded-md border border-line bg-paper p-5">
+          <div className="font-mono text-micro uppercase tracking-[0.14em] text-ink-3">Captura · administrador</div>
           <div className="inline-flex self-start rounded-sm border border-line-strong bg-canvas p-0.5">
             {(["datos", "ficha"] as const).map((t) => (
               <button

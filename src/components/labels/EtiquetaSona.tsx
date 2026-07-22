@@ -104,20 +104,6 @@ function moodDe(lects: number[]) {
   return mejor;
 }
 
-function partirLineas(texto: string, max: number, lineas: number): string[] {
-  const out: string[] = [];
-  let linea = "";
-  for (const w of texto.split(/\s+/)) {
-    if ((linea + " " + w).trim().length > max) {
-      out.push(linea.trim());
-      linea = w;
-      if (out.length === lineas - 1) break;
-    } else linea = (linea + " " + w).trim();
-  }
-  if (linea && out.length < lineas) out.push(linea.trim());
-  return out;
-}
-
 /* Blueprint Sensorial: el color identifica al factor (Eva Heller);
    la intensidad se comunica con tratamientos de saturación:
    bajo = +40% blanco · medio = +20% · alto = color base. */
@@ -131,6 +117,18 @@ const FACTOR_COLOR: Record<CategoryId, string> = {
   pause: "#C8C1B2",
 };
 const NIVEL_MEZCLA = [0.4, 0.2, 0];
+
+/* NIVEL 1 — interpretación inmediata por estado: significado, no
+   métricas. Responde "¿qué encontraré y cómo podría sentirme?" */
+const INTERPRETACION: Record<string, string[]> = {
+  calm: ["Carga sensorial baja.", "Ideal para permanecer largos periodos.", "No se esperan cambios abruptos."],
+  active: ["Hay energía y sonido presentes.", "Buen lugar para lo social; concentrarse puede costar.", "Los estímulos suben y bajan con la actividad."],
+  busy: ["Movimiento constante, con orden.", "Funciona bien para estancias breves.", "Conviene ubicar las zonas de pausa al llegar."],
+  crowded: ["Mucha gente y pocas pausas disponibles.", "La exigencia sensorial se acumula con el tiempo.", "Mejor en horarios valle o con preparativos."],
+  balanced: ["Estímulos moderados y orientación clara.", "Compatible con la mayoría de las necesidades.", "Puedes decidir tu ritmo sin presión."],
+  dynamic: ["El entorno cambia con frecuencia.", "Pueden ocurrir cambios inesperados.", "Planifica estancias cortas o flexibles."],
+  unstable: ["Estímulos altos y poco predecibles.", "La visita puede resultar demandante.", "Se recomienda visita breve o acompañada."],
+};
 
 const MONO = '"IBM Plex Mono", ui-monospace, monospace';
 const SANS = '"Inter", system-ui, sans-serif';
@@ -152,11 +150,16 @@ export const EtiquetaSona = forwardRef<SVGSVGElement, { profile: SensorProfile; 
     const profundo = mezclaHex(mood.profOsc, mood.profCl, luz);
     const papel = "#F7F4EE";        /* fondo del blueprint (fijo) */
     const tinta = "#1F334F";        /* color estructura */
-    const pct = Math.round((lects.reduce((a, b) => a + b, 0) / 7) * 100);
     const sheet = useMemo(() => profileSheet(profile), [profile]);
-    const descLineas = partirLineas(sheet.anticipation, 56, 3);
+    const interpretacion = INTERPRETACION[mood.id] ?? [];
+    /* NIVEL 3 — recomendaciones accionables: primero las dimensiones
+       más exigentes; si todo está bajo, el espacio simplemente recibe */
+    const recomendaciones = [...sheet.rows]
+      .sort((a, b) => b.pct - a.pct)
+      .map((r) => r.recommendation)
+      .filter(Boolean)
+      .slice(0, 3);
     const fecha = new Date().toLocaleDateString("es-MX", { day: "numeric", month: "numeric", year: "numeric" });
-    const firmaTec = RING_ORDER.map((id) => `${getCategory(id).code}·${intensitySeverity(profile.params[id]?.intensity ?? 0) + 1}`).join("  ");
     const ids = SCORE[beat];
 
     /* filas de medidores: orden angular canónico, 2 columnas */
@@ -264,43 +267,34 @@ export const EtiquetaSona = forwardRef<SVGSVGElement, { profile: SensorProfile; 
           {`${profile.site.toUpperCase()} · ${profile.name.toUpperCase()} · ${profile.code}`}
         </text>
 
-        {/* héroe: índice + estado */}
-        <text x="40" y="524" fill={tinta} opacity={0.6} style={{ font: `500 10px ${MONO}`, letterSpacing: "0.14em" }}>ÍNDICE DEL LUGAR</text>
-        <text x="40" y="580" fill={tinta} style={{ font: `200 58px ${SANS}` }}>
-          {pct}<tspan style={{ font: `300 22px ${SANS}` }} opacity={0.55}>%</tspan>
-        </text>
-        <text x="660" y="524" fill={tinta} opacity={0.6} textAnchor="end" style={{ font: `500 10px ${MONO}`, letterSpacing: "0.14em" }}>ESTADO</text>
-        <text x="660" y="568" fill={tinta} textAnchor="end" style={{ font: `300 34px ${SANS}` }}>{mood.nombre}</text>
-
-        <line x1="40" y1="616" x2="660" y2="616" stroke={tinta} strokeWidth="1" opacity="0.14" />
-
-        {/* medidores en una columna: comparables de un vistazo */}
-        {filas.map((f, i) => metro(f, 40, 652 + i * 42))}
-
-        <line x1="40" y1="942" x2="660" y2="942" stroke={tinta} strokeWidth="1" opacity="0.14" />
-
-        {/* descripción anticipatoria */}
-        <text x="40" y="972" fill={tinta} opacity={0.75} style={{ font: `500 9px ${MONO}`, letterSpacing: "0.14em" }}>DESCRIPCIÓN DEL ESPACIO</text>
-        {descLineas.map((ln, i) => (
-          <text key={i} x="40" y={998 + i * 22} fill={tinta} style={{ font: `400 11.5px ${MONO}` }}>{ln}</text>
+        {/* NIVEL 1 — primero significado, después datos */}
+        <text x="40" y="524" fill={tinta} opacity={0.6} style={{ font: `500 10px ${MONO}`, letterSpacing: "0.14em" }}>ESTADO</text>
+        <text x="40" y="574" fill={tinta} style={{ font: `300 44px ${SANS}` }}>{mood.nombre}</text>
+        <text x="660" y="524" fill={tinta} opacity={0.6} textAnchor="end" style={{ font: `500 10px ${MONO}`, letterSpacing: "0.14em" }}>CARGA SENSORIAL</text>
+        <text x="660" y="566" fill={tinta} textAnchor="end" style={{ font: `300 26px ${SANS}`, textTransform: "capitalize" }}>{sheet.loadWord}</text>
+        {interpretacion.map((ln, i) => (
+          <text key={i} x="40" y={614 + i * 26} fill={tinta} opacity={0.85} style={{ font: `400 15px ${SANS}` }}>{ln}</text>
         ))}
 
-        {/* barra índice */}
-        <g>
-          <clipPath id="barraClipSona"><rect x="40" y="1088" width="620" height="42" rx="13" /></clipPath>
-          <rect x="40" y="1088" width="620" height="42" rx="13" fill="url(#barraSona)" />
-          <rect x={40 + 620 * (pct / 100)} y="1088" width={620 * (1 - pct / 100)} height="42" clipPath="url(#barraClipSona)" fill={papel} opacity="0.82" />
-          <text x="54" y="1116" fill={tinta} style={{ font: `300 22px ${SANS}` }}>
-            {pct}<tspan style={{ font: `300 11px ${SANS}` }} opacity={0.5}>%</tspan>
-          </text>
-        </g>
+        <line x1="40" y1="706" x2="660" y2="706" stroke={tinta} strokeWidth="1" opacity="0.14" />
+
+        {/* medidores en una columna: comparables de un vistazo */}
+        {filas.map((f, i) => metro(f, 40, 736 + i * 42))}
+
+        <line x1="40" y1="1024" x2="660" y2="1024" stroke={tinta} strokeWidth="1" opacity="0.14" />
+
+        {/* NIVEL 3 — qué puedo hacer */}
+        <text x="40" y="1054" fill={tinta} opacity={0.75} style={{ font: `500 9px ${MONO}`, letterSpacing: "0.14em" }}>QUÉ PUEDO HACER</text>
+        {recomendaciones.map((ln, i) => (
+          <text key={i} x="40" y={1082 + i * 26} fill={tinta} opacity={0.9} style={{ font: `400 14px ${SANS}` }}>{`· ${ln}`}</text>
+        ))}
 
         {/* firma serif */}
         <text x="350" y="1178" textAnchor="middle" fill="#000000" style={{ font: `italic 400 26px ${SERIF}`, letterSpacing: "0.03em" }}>sona</text>
 
         {/* pie */}
         <text x="40" y="1218" fill={tinta} opacity={0.55} style={{ font: `500 8.5px ${MONO}`, letterSpacing: "0.12em" }}>SONA · LECTURA DEL LUGAR</text>
-        <text x="660" y="1218" fill={tinta} opacity={0.55} textAnchor="end" style={{ font: `500 8.5px ${MONO}`, letterSpacing: "0.1em" }}>{firmaTec}</text>
+        <text x="660" y="1218" fill={tinta} opacity={0.55} textAnchor="end" style={{ font: `500 8.5px ${MONO}`, letterSpacing: "0.1em" }}>{`${profile.site.toUpperCase()} · ${profile.code}`}</text>
       </svg>
     );
   }
