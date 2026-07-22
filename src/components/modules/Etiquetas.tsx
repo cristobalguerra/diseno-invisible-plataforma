@@ -1,5 +1,5 @@
 import { useMemo, useRef, useState } from "react";
-import { Box, Download, ScanLine } from "lucide-react";
+import { Download, ScanLine } from "lucide-react";
 import type { CategoryId } from "../../lib/types";
 import { CATEGORIES, CATEGORY_COLOR } from "../../data/catalog";
 import type { CategoryParams, DataSource, SensorProfile } from "../../lib/labels/types";
@@ -7,10 +7,7 @@ import { SOURCE_SHORT } from "../../lib/labels/types";
 import { globalLoad, setParam } from "../../lib/labels/profiles";
 import { profileSheet } from "../../lib/labels/sheet";
 import { downloadPng, downloadSvg } from "../../lib/export";
-import { downloadSealStl } from "../../lib/export3d";
 import { Button, Eyebrow, Segmented, cx } from "../ui/kit";
-import { SealLegend, SensorSeal } from "../labels/SensorSeal";
-import { SensorNetwork } from "../labels/SensorNetwork";
 import { EtiquetaSona } from "../labels/EtiquetaSona";
 import { JourneyMap } from "../labels/JourneyMap";
 
@@ -25,10 +22,10 @@ const PARAMS: { key: keyof CategoryParams; label: string }[] = [
 
 /** lo que el sello (color, nivel 1) muestra de verdad */
 const MAPPING: [string, string][] = [
-  ["Intensidad", "longitud del radio"],
-  ["Duración", "grosor del radio"],
-  ["Categoría", "posición fija + color"],
-  ["Confianza", "opacidad del radio"],
+  ["Intensidad", "medidor y palabra de nivel"],
+  ["Estado", "familia de color de la etiqueta"],
+  ["Índice", "promedio de las 7 lecturas"],
+  ["Confianza", "se registra por categoría"],
 ];
 
 const SOURCES: DataSource[] = ["sensor", "observation", "survey"];
@@ -46,7 +43,6 @@ export function Etiquetas({
 }) {
   const [selectedCat, setSelectedCat] = useState<CategoryId>("sound");
   const [tab, setTab] = useState<"datos" | "ficha">("datos");
-  const [glyph, setGlyph] = useState<"network" | "blueprint" | "seal" | "sona">("network");
   const sealRef = useRef<SVGSVGElement>(null);
 
   const profile = profiles.find((p) => p.id === selectedId) ?? profiles[0];
@@ -63,20 +59,19 @@ export function Etiquetas({
     );
   }
 
-  const fname = `sello-${profile.code}`;
+  const fname = `etiqueta-${profile.code}`;
 
   return (
     <div className="flex flex-col">
       <header className="border-b border-line px-5 py-6 md:px-8 md:py-7">
-        <Eyebrow>02 · Estudio del sello</Eyebrow>
+        <Eyebrow>02 · Etiqueta</Eyebrow>
         <h1 className="mt-2 text-display font-bold leading-[1.1] tracking-tight text-ink md:text-display-lg">
-          Sello sensorial generativo
+          Etiqueta de lectura del lugar
         </h1>
         <p className="mt-2 max-w-[68ch] text-strong leading-relaxed text-ink-2">
-          El sello de un espacio se <strong>genera</strong> de sus datos: cada categoría ocupa una
-          <strong> posición fija</strong> y se dibuja como un radio en su <strong>color</strong>
-          (longitud = intensidad, grosor = duración). Aquí capturas o corriges los datos medidos y el
-          sello se regenera. Al escanear, abre la ficha de anticipación.
+          La lectura de un espacio se <strong>clasifica en un estado</strong> que tiñe la etiqueta
+          completa: índice, medidores de las siete categorías y descripción anticipatoria. Aquí
+          capturas o corriges los datos medidos y la etiqueta se regenera al instante.
         </p>
       </header>
 
@@ -84,27 +79,8 @@ export function Etiquetas({
         {/* sello + controles */}
         <section className="flex flex-col gap-5">
           <div className="flex flex-col items-center gap-3 rounded-md border border-line bg-sunken p-6">
-            <div className="self-end">
-              <Segmented<"network" | "blueprint" | "seal" | "sona">
-                size="sm"
-                value={glyph}
-                onChange={setGlyph}
-                options={[
-                  { value: "network", label: "Símbolo" },
-                  { value: "blueprint", label: "Construcción" },
-                  { value: "seal", label: "Sello radial" },
-                  { value: "sona", label: "Etiqueta SONA" },
-                ]}
-              />
-            </div>
-            <div className="w-full max-w-[360px]" style={{ aspectRatio: glyph === "sona" ? "7 / 10" : "1 / 1" }}>
-              {glyph === "sona" ? (
-                <EtiquetaSona key={profile.id} ref={sealRef} profile={profile} animateIn />
-              ) : glyph === "seal" ? (
-                <SensorSeal key={profile.id} ref={sealRef} profile={profile} animateIn />
-              ) : (
-                <SensorNetwork key={profile.id} ref={sealRef} profile={profile} construction={glyph === "blueprint"} />
-              )}
+            <div className="w-full max-w-[400px]" style={{ aspectRatio: "7 / 10" }}>
+              <EtiquetaSona key={profile.id} ref={sealRef} profile={profile} animateIn />
             </div>
             <div className="flex w-full items-baseline justify-between border-t border-line pt-3">
               <div className="min-w-0">
@@ -112,20 +88,6 @@ export function Etiquetas({
                 <div className="text-strong font-semibold text-ink">{profile.name}</div>
               </div>
               <span className="shrink-0 font-mono text-eyebrow text-ink-3">carga {Math.round(load * 100)}%</span>
-            </div>
-          </div>
-
-          {/* leyenda de posiciones */}
-          <div className="flex items-center gap-4 rounded-md border border-line bg-paper p-4">
-            <div className="h-[120px] w-[120px] shrink-0">
-              <SealLegend />
-            </div>
-            <div className="min-w-0">
-              <div className="text-caption font-semibold text-ink">Posiciones fijas</div>
-              <p className="mt-1 text-caption leading-snug text-ink-2">
-                Cada categoría ocupa siempre el mismo sector y color del anillo. Esa constancia es lo
-                que vuelve el sistema aprendible: con el tiempo se reconoce un perfil de un vistazo.
-              </p>
             </div>
           </div>
 
@@ -154,7 +116,6 @@ export function Etiquetas({
             <div className="flex gap-2">
               <Button icon={<Download size={14} />} onClick={() => sealRef.current && downloadSvg(sealRef.current, fname)}>SVG</Button>
               <Button icon={<Download size={14} />} onClick={() => sealRef.current && downloadPng(sealRef.current, fname)}>PNG</Button>
-              <Button icon={<Box size={14} />} onClick={() => downloadSealStl(profile, fname)} title="Relieve táctil imprimible en 3D (STL)">STL 3D</Button>
             </div>
           </div>
         </section>
@@ -217,7 +178,7 @@ export function Etiquetas({
               </div>
 
               <div className="mt-1 rounded-sm border border-line bg-sunken p-3">
-                <div className="mb-1.5 text-micro font-semibold uppercase tracking-[0.08em] text-ink-3">Qué muestra el sello</div>
+                <div className="mb-1.5 text-micro font-semibold uppercase tracking-[0.08em] text-ink-3">Qué muestra la etiqueta</div>
                 <div className="grid grid-cols-2 gap-x-3 gap-y-1">
                   {MAPPING.map(([k, v]) => (
                     <div key={k} className="flex items-baseline gap-1.5 text-eyebrow leading-snug">

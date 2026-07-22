@@ -6,40 +6,40 @@
    tipográfica fija (rem) con roles semánticos. Ver DESIGN.md.
 ---------------------------------------------------------------------------- */
 @theme {
-  /* INSTRUMENTO OSCURO. Neutros tintados hacia el hue de marca (262), nunca
-     negro puro; la profundidad viene de la luminosidad de la superficie, no de
-     sombra. El color saturado está reservado al DATO (las 7 categorías). */
-  --color-sunken: oklch(0.142 0.009 262); /* pozos / insets (lo más profundo) */
-  --color-canvas: oklch(0.176 0.01 262); /* panel base */
-  --color-paper: oklch(0.225 0.012 262); /* superficie elevada */
-  --color-line: oklch(0.305 0.012 262); /* regla de pelo */
-  --color-line-strong: oklch(0.42 0.015 262); /* regla fuerte */
+  /* LÍNEA SONA. Papel neutro-cálido, tinta casi negra y la familia bruma
+     azul-gris del instrumento SONA; el color saturado se silencia a las
+     familias de la etiqueta. Museo entre semana a las 9 am. */
+  --color-sunken: #e7e6e0; /* pozos / insets */
+  --color-canvas: #f1f0ea; /* papel base (el papel de la etiqueta) */
+  --color-paper: #f8f7f2; /* superficie elevada */
+  --color-line: #dbdad3; /* regla de pelo */
+  --color-line-strong: #c2c1b9; /* regla fuerte */
 
-  --color-ink: oklch(0.955 0.006 262); /* texto principal */
-  --color-ink-2: oklch(0.745 0.013 262); /* secundario */
-  --color-ink-3: oklch(0.575 0.013 262); /* etiquetas / mudo */
+  --color-ink: #1e2126; /* tinta */
+  --color-ink-2: #3d4e60; /* bruma profunda (la tinta del logo SONA) */
+  --color-ink-3: #75808c; /* etiquetas / mudo */
 
-  --color-accent: oklch(0.9 0.19 122); /* señal viva del instrumento: foco / live */
-  --color-accent-ink: oklch(0.2 0.02 262);
-  --color-accent-weak: oklch(0.27 0.035 262);
+  --color-accent: #6b84a0; /* acento bruma */
+  --color-accent-ink: #f1f0ea;
+  --color-accent-weak: #e0e5e9;
 
-  /* COLOR = DATO. Codificación sensorial por categoría: única fuente de color
-     saturado, la lectura luminosa del instrumento. */
-  --color-cat-sound: #b79cff; /* violeta */
-  --color-cat-light: #ffe974; /* amarillo */
-  --color-cat-flow: #5bd1e6; /* cian */
-  --color-cat-wait: #ff8a4c; /* naranja */
-  --color-cat-orientation: #8fafef; /* azul */
-  --color-cat-visual: #ff6ba3; /* magenta */
-  --color-cat-pause: #a6e0a0; /* verde salvia */
+  /* COLOR = DATO, silenciado a la línea SONA: mismas identidades de hue,
+     saturación de museo. */
+  --color-cat-sound: #8579b3; /* violeta bruma */
+  --color-cat-light: #a8946a; /* ámbar (Activo) */
+  --color-cat-flow: #6f9a9b; /* teal (Ajetreado) */
+  --color-cat-wait: #a07868; /* terracota (Concurrido) */
+  --color-cat-orientation: #7d93ab; /* azul bruma (Calmado) */
+  --color-cat-visual: #a5798d; /* magenta silenciado */
+  --color-cat-pause: #7fa08c; /* verde salvia (Equilibrado) */
 
-  /* Valencia emocional (journey): brillantes sobre oscuro, con fondo tenue. */
-  --color-low: #5fd98a;
-  --color-low-bg: oklch(0.26 0.05 152);
-  --color-mid: #ffd45c;
-  --color-mid-bg: oklch(0.28 0.05 86);
-  --color-high: #ff6f6f;
-  --color-high-bg: oklch(0.28 0.08 25);
+  /* Valencia emocional (journey) sobre papel. */
+  --color-low: #7fa08c;
+  --color-low-bg: #e2e8df;
+  --color-mid: #a8946a;
+  --color-mid-bg: #ece5d2;
+  --color-high: #a0685c;
+  --color-high-bg: #ecdcd5;
 
   --font-sans: "Inter", system-ui, -apple-system, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", monospace;

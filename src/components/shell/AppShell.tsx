@@ -7,7 +7,7 @@ export type ModuleId = "library" | "etiquetas" | "medicion" | "plano";
 
 const NAV: { id: ModuleId; n: string; label: string; desc: string; icon: typeof LayoutGrid }[] = [
   { id: "library", n: "01", label: "Espacios medidos", desc: "Repositorio de la investigación", icon: LayoutGrid },
-  { id: "etiquetas", n: "02", label: "Estudio del sello", desc: "Sello + recorrido sensorial", icon: Radar },
+  { id: "etiquetas", n: "02", label: "Etiqueta", desc: "Lectura del lugar", icon: Radar },
   { id: "medicion", n: "03", label: "Medición", desc: "Cámara y micrófono", icon: Gauge },
   { id: "plano", n: "04", label: "Blueprint sensorial", desc: "Lámina y disposición del sitio", icon: Map },
 ];
