@@ -318,7 +318,7 @@ export const EtiquetaSona = forwardRef<SVGSVGElement, { profile: SensorProfile; 
     return (
       <svg
         ref={ref}
-        viewBox={hoja ? "0 400 700 844" : "0 0 700 1244"}
+        viewBox={hoja ? "0 400 700 920" : "0 0 700 1320"}
         role="img"
         aria-label={`Etiqueta SONA de ${profile.name}`}
         style={plena
@@ -368,8 +368,8 @@ export const EtiquetaSona = forwardRef<SVGSVGElement, { profile: SensorProfile; 
           </filter>
         </defs>
 
-        <rect width="700" height="1244" rx={plena ? 0 : 26} fill={papel} />
-        <clipPath id="recorteSona"><rect width="700" height="1244" rx={plena ? 0 : 26} /></clipPath>
+        <rect width="700" height="1320" rx={plena ? 0 : 26} fill={papel} />
+        <clipPath id="recorteSona"><rect width="700" height="1320" rx={plena ? 0 : 26} /></clipPath>
         <g clipPath="url(#recorteSona)">
           <rect width="700" height="400" fill="url(#cieloSona)" />
           {/* palabra sona en vidrio líquido, recomponiéndose por compases */}
@@ -410,17 +410,17 @@ export const EtiquetaSona = forwardRef<SVGSVGElement, { profile: SensorProfile; 
         <line x1="40" y1="1070" x2="660" y2="1070" stroke={tinta} strokeWidth="1" opacity="0.14" />
 
         {/* NIVEL 3 — qué puedo hacer */}
-        <text x="40" y="1106" fill={tinta} opacity={0.75} style={{ font: `500 16px ${MONO}`, letterSpacing: "0.14em" }}>QUÉ PUEDO HACER</text>
+        <text x="40" y="1108" fill={tinta} opacity={0.75} style={{ font: `500 16px ${MONO}`, letterSpacing: "0.14em" }}>QUÉ PUEDO HACER</text>
         {recomendaciones.map((ln, i) => (
-          <text key={i} x="40" y={1138 + i * 32} fill={tinta} opacity={0.9} style={{ font: `400 24px ${SANS}` }}>{`· ${ln}`}</text>
+          <text key={i} x="40" y={1146 + i * 36} fill={tinta} opacity={0.9} style={{ font: `400 24px ${SANS}` }}>{`· ${ln}`}</text>
         ))}
 
         {/* firma serif */}
-        <text x="350" y="1236" textAnchor="middle" fill="#000000" style={{ font: `italic 400 28px ${SERIF}`, letterSpacing: "0.03em" }}>sona</text>
+        <text x="350" y="1288" textAnchor="middle" fill="#000000" style={{ font: `italic 400 28px ${SERIF}`, letterSpacing: "0.03em" }}>sona</text>
 
         {/* pie */}
-        <text x="40" y="1234" fill={tinta} opacity={0.55} style={{ font: `500 13px ${MONO}`, letterSpacing: "0.1em" }}>SONA · LECTURA DEL LUGAR</text>
-        <text x="660" y="1234" fill={tinta} opacity={0.55} textAnchor="end" style={{ font: `500 13px ${MONO}`, letterSpacing: "0.08em" }}>{`${profile.site.toUpperCase()} · ${profile.code}`}</text>
+        <text x="40" y="1286" fill={tinta} opacity={0.55} style={{ font: `500 13px ${MONO}`, letterSpacing: "0.1em" }}>SONA · LECTURA DEL LUGAR</text>
+        <text x="660" y="1286" fill={tinta} opacity={0.55} textAnchor="end" style={{ font: `500 13px ${MONO}`, letterSpacing: "0.08em" }}>{`${profile.site.toUpperCase()} · ${profile.code}`}</text>
       </svg>
     );
   }

@@ -15,7 +15,7 @@ import { CieloSona, EtiquetaSona, PalabraSona, tonoProfundo } from "./EtiquetaSo
    ============================================================ */
 
 const CABEZAL_MIN = 190; /* aire mínimo reservado a sona arriba */
-const HOJA_W = 700, HOJA_H = 844; /* proporción del arte de la hoja */
+const HOJA_W = 700, HOJA_H = 920; /* proporción del arte de la hoja */
 
 export function FichaPublica({ profiles, code }: { profiles: SensorProfile[]; code: string }) {
   const profile = profiles.find((p) => p.code.toLowerCase() === code.toLowerCase());

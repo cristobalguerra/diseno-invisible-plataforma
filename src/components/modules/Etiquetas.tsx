@@ -122,7 +122,7 @@ export function Etiquetas({
         {/* sello + controles */}
         <section className="flex flex-col gap-5">
           <div className="flex flex-col items-center gap-3 rounded-md border border-line bg-sunken p-6">
-            <div className="w-full max-w-[400px]" style={{ aspectRatio: "9 / 16" }}>
+            <div className="w-full max-w-[400px]" style={{ aspectRatio: "700 / 1320" }}>
               <EtiquetaSona key={profile.id} ref={sealRef} profile={profile} animateIn />
             </div>
             <div className="flex w-full items-baseline justify-between border-t border-line pt-3">
