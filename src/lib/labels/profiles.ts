@@ -1,4 +1,5 @@
 import type { CategoryId } from "../types";
+import { supabase } from "../supabase";
 import type { CategoryParams, DataSource, ProfileParams, SensorProfile } from "./types";
 import { RING_ORDER } from "./types";
 
@@ -120,9 +121,48 @@ export function setParam(
   p: SensorProfile,
   cat: CategoryId,
   key: keyof CategoryParams,
-  value: number | DataSource,
+  value: number | DataSource | boolean,
 ): SensorProfile {
   return { ...p, params: { ...p.params, [cat]: { ...p.params[cat], [key]: value } } };
+}
+
+/** ¿la categoría cuenta como evaluada? (undefined = datos previos → sí) */
+export function isEvaluated(cp: CategoryParams): boolean {
+  return cp.evaluated !== false;
+}
+
+/** firma de una categoría recién creada (newSpace), ignorando la intensidad */
+function isNeutralCat(cp: CategoryParams): boolean {
+  return (
+    cp.source === "observation" &&
+    cp.confidence === 0.7 &&
+    cp.peak === 0.5 &&
+    cp.variability === 0.4 &&
+    cp.duration === 0.4 &&
+    cp.predictability === 0.6
+  );
+}
+
+/**
+ * Retro-rellena el marcador `evaluated` en datos previos a su existencia. A nivel
+ * de ESPACIO: si TODAS sus categorías tienen la firma neutra de un espacio recién
+ * creado, se considera no evaluado (todas false); si alguna varía, el espacio fue
+ * trabajado y se marcan todas true. Evita falsos negativos por categorías de seed
+ * que coinciden con la plantilla.
+ */
+function migrateEvaluated(list: SensorProfile[]): SensorProfile[] {
+  return list.map((p) => {
+    const untouched = RING_ORDER.every((c) => isNeutralCat(p.params[c]));
+    let changed = false;
+    const params = { ...p.params } as ProfileParams;
+    for (const c of RING_ORDER) {
+      if (params[c].evaluated === undefined) {
+        params[c] = { ...params[c], evaluated: !untouched };
+        changed = true;
+      }
+    }
+    return changed ? { ...p, params } : p;
+  });
 }
 
 /* ----------------------------------------------------------- repositorio -- */
@@ -137,12 +177,12 @@ export function loadProfiles(): SensorProfile[] {
     const raw = typeof localStorage !== "undefined" ? localStorage.getItem(STORAGE_KEY) : null;
     if (raw) {
       const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed) && parsed.length) return parsed as SensorProfile[];
+      if (Array.isArray(parsed) && parsed.length) return migrateEvaluated(parsed as SensorProfile[]);
     }
   } catch {
     /* almacenamiento no disponible → se usan los espacios de ejemplo */
   }
-  return PROFILES;
+  return migrateEvaluated(PROFILES);
 }
 
 export function saveProfiles(list: SensorProfile[]): void {
@@ -153,9 +193,44 @@ export function saveProfiles(list: SensorProfile[]): void {
   }
 }
 
-/** Crea un espacio recién registrado con parámetros neutros (a la espera de datos). */
+/* --------------------------------------------------- repositorio remoto --- */
+/**
+ * Capa Supabase: misma forma (`SensorProfile`) pero persistida en `public.profiles`.
+ * `params` viaja como JSONB. La app trabaja con la lista completa en memoria; las
+ * funciones de sync calculan el diff (alta/edición/baja) y emiten upserts/deletes.
+ */
+type ProfileRow = Pick<SensorProfile, "id" | "code" | "site" | "name" | "params">;
+
+function toRow(p: SensorProfile): ProfileRow {
+  return { id: p.id, code: p.code, site: p.site, name: p.name, params: p.params };
+}
+
+export async function fetchProfilesRemote(): Promise<SensorProfile[]> {
+  if (!supabase) return [];
+  const { data, error } = await supabase
+    .from("profiles")
+    .select("id,code,site,name,params")
+    .order("site", { ascending: true })
+    .order("code", { ascending: true });
+  if (error) throw error;
+  return migrateEvaluated((data ?? []) as SensorProfile[]);
+}
+
+export async function upsertProfilesRemote(rows: SensorProfile[]): Promise<void> {
+  if (!supabase || rows.length === 0) return;
+  const { error } = await supabase.from("profiles").upsert(rows.map(toRow));
+  if (error) throw error;
+}
+
+export async function deleteProfilesRemote(ids: string[]): Promise<void> {
+  if (!supabase || ids.length === 0) return;
+  const { error } = await supabase.from("profiles").delete().in("id", ids);
+  if (error) throw error;
+}
+
+/** Crea un espacio recién registrado con parámetros neutros, SIN evaluar aún. */
 export function newSpace(name: string, code: string, site: string): SensorProfile {
   const params = {} as ProfileParams;
-  for (const c of RING_ORDER) params[c] = pr(0.4, 0.5, 0.4, 0.4, 0.6, 0.7, "observation");
+  for (const c of RING_ORDER) params[c] = { ...pr(0.4, 0.5, 0.4, 0.4, 0.6, 0.7, "observation"), evaluated: false };
   return { id: `esp-${Date.now()}`, code, site, name, params };
 }

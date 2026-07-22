@@ -23,7 +23,7 @@ export function Segmented<T extends string>({
   options: SegOption<T>[];
   size?: "sm" | "md";
 }) {
-  const pad = size === "sm" ? "px-2.5 py-1 text-[12px]" : "px-3 py-1.5 text-[13px]";
+  const pad = size === "sm" ? "px-2.5 py-1 text-caption" : "px-3 py-1.5 text-body";
   return (
     <div className="inline-flex rounded-sm border border-line-strong bg-paper p-0.5">
       {options.map((o) => {
@@ -65,7 +65,7 @@ export function Toggle({
       role="switch"
       aria-checked={checked}
       onClick={() => onChange(!checked)}
-      className="inline-flex items-center gap-2 text-[13px] text-ink-2 hover:text-ink"
+      className="inline-flex items-center gap-2 text-body text-ink-2 hover:text-ink"
     >
       <span
         className={cx(
@@ -111,7 +111,7 @@ export function Button({
       disabled={disabled}
       title={title}
       className={cx(
-        "inline-flex items-center gap-1.5 rounded-sm border px-3 py-1.5 text-[13px] font-medium transition duration-150 ease-out active:scale-[0.97] disabled:opacity-40 disabled:active:scale-100",
+        "inline-flex items-center gap-1.5 rounded-sm border px-3 py-1.5 text-body font-medium transition duration-150 ease-out active:scale-[0.97] disabled:opacity-40 disabled:active:scale-100",
         styles,
       )}
     >
@@ -133,23 +133,23 @@ export function Field({
 }) {
   return (
     <label className="flex flex-col gap-1.5">
-      <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-3">{label}</span>
+      <span className="text-eyebrow font-semibold uppercase tracking-[0.08em] text-ink-3">{label}</span>
       {children}
-      {hint && <span className="text-[11px] leading-snug text-ink-3">{hint}</span>}
+      {hint && <span className="text-eyebrow leading-snug text-ink-3">{hint}</span>}
     </label>
   );
 }
 
 export function Eyebrow({ children }: { children: ReactNode }) {
   return (
-    <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-ink-3">{children}</span>
+    <span className="font-mono text-eyebrow uppercase tracking-[0.14em] text-ink-3">{children}</span>
   );
 }
 
 /* ---- Severity chip (dot + texto, nunca solo color) ---------------------- */
 export function SeverityChip({ sev, label }: { sev: Severity; label: string }) {
   return (
-    <span className="inline-flex items-center gap-1.5 rounded-full border border-line bg-paper px-2 py-0.5 text-[11px] font-medium text-ink-2">
+    <span className="inline-flex items-center gap-1.5 rounded-full border border-line bg-paper px-2 py-0.5 text-eyebrow font-medium text-ink-2">
       <span className="h-2 w-2 rounded-full" style={{ background: SEVERITY_COLOR[sev] }} aria-hidden />
       {label}
     </span>

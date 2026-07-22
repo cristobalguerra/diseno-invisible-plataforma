@@ -11,7 +11,7 @@ import type { CategoryDef, CategoryId, Severity, SeverityName } from "../lib/typ
 export const CATEGORIES: CategoryDef[] = [
   {
     id: "sound",
-    code: "SND",
+    code: "SON",
     name: "Sonido",
     variable: "Ruido ambiental",
     scale: "Intensidad sonora",
@@ -27,7 +27,7 @@ export const CATEGORIES: CategoryDef[] = [
   },
   {
     id: "light",
-    code: "LGT",
+    code: "LUZ",
     name: "Luz",
     variable: "Iluminación ambiental",
     scale: "Intensidad lumínica",
@@ -43,7 +43,7 @@ export const CATEGORIES: CategoryDef[] = [
   },
   {
     id: "flow",
-    code: "FLW",
+    code: "FLU",
     name: "Flujo",
     variable: "Movimiento de personas",
     scale: "Densidad de flujo",
@@ -59,7 +59,7 @@ export const CATEGORIES: CategoryDef[] = [
   },
   {
     id: "visual",
-    code: "VIS",
+    code: "SVI",
     name: "Saturación visual",
     variable: "Estímulos visuales",
     scale: "Carga visual",
@@ -75,7 +75,7 @@ export const CATEGORIES: CategoryDef[] = [
   },
   {
     id: "wait",
-    code: "WAI",
+    code: "ESP",
     name: "Espera",
     variable: "Tiempo de permanencia",
     scale: "Duración de espera",

@@ -59,10 +59,10 @@ export function Espacios({
     <div className="flex flex-col">
       <header className="border-b border-line px-5 py-6 md:px-8 md:py-7">
         <Eyebrow>01 · Espacios medidos</Eyebrow>
-        <h1 className="mt-2 text-[26px] font-bold leading-[1.1] tracking-tight text-ink md:text-[30px]">
+        <h1 className="mt-2 text-display font-bold leading-[1.1] tracking-tight text-ink md:text-display-lg">
           Repositorio de la investigación
         </h1>
-        <p className="mt-2 max-w-[64ch] text-[14px] leading-relaxed text-ink-2">
+        <p className="mt-2 max-w-[64ch] text-strong leading-relaxed text-ink-2">
           Los espacios se agrupan por <strong>sitio</strong> (un edificio o recinto) y, dentro, sus
           espacios medidos, cada uno con su <strong>sello sensorial</strong> generado de sus datos.
           La colección crece por grupos conforme avanza la investigación.
@@ -73,13 +73,13 @@ export function Espacios({
       <div className="flex flex-wrap items-end justify-between gap-3 border-b border-line px-5 py-4 md:px-8">
         <div className="flex flex-wrap items-end gap-2">
           <label className="flex flex-col gap-1">
-            <span className="text-[10px] font-semibold uppercase tracking-[0.08em] text-ink-3">Sitio / edificio</span>
+            <span className="text-micro font-semibold uppercase tracking-[0.08em] text-ink-3">Sitio / edificio</span>
             <input
               list="di-sites"
               value={site}
               onChange={(e) => setSite(e.target.value)}
               placeholder="Museo MARCO…"
-              className="w-[200px] rounded-sm border border-line-strong bg-paper px-2.5 py-1.5 text-[13px] text-ink transition-colors duration-150 ease-out focus-visible:border-accent"
+              className="w-[200px] rounded-sm border border-line-strong bg-paper px-2.5 py-1.5 text-body text-ink transition-colors duration-150 ease-out focus-visible:border-accent"
             />
             <datalist id="di-sites">
               {sites.map((s) => (
@@ -88,20 +88,20 @@ export function Espacios({
             </datalist>
           </label>
           <label className="flex flex-col gap-1">
-            <span className="text-[10px] font-semibold uppercase tracking-[0.08em] text-ink-3">Espacio</span>
+            <span className="text-micro font-semibold uppercase tracking-[0.08em] text-ink-3">Espacio</span>
             <input
               value={name}
               onChange={(e) => setName(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && register()}
               placeholder="Entrada, sala, pasillo…"
-              className="w-[200px] rounded-sm border border-line-strong bg-paper px-2.5 py-1.5 text-[13px] text-ink transition-colors duration-150 ease-out focus-visible:border-accent"
+              className="w-[200px] rounded-sm border border-line-strong bg-paper px-2.5 py-1.5 text-body text-ink transition-colors duration-150 ease-out focus-visible:border-accent"
             />
           </label>
           <Button variant="primary" icon={<Plus size={14} />} onClick={register}>
             Registrar y medir
           </Button>
         </div>
-        <span className="font-mono text-[11px] text-ink-3">
+        <span className="font-mono text-eyebrow text-ink-3">
           {groups.length} sitios · {profiles.length} espacios
         </span>
       </div>
@@ -111,8 +111,8 @@ export function Espacios({
         {groups.map(({ site: s, spaces }) => (
           <section key={s} className="border-b border-line px-5 py-6 last:border-b-0 md:px-8">
             <div className="mb-4 flex items-baseline gap-3">
-              <h2 className="text-[16px] font-bold tracking-tight text-ink">{s}</h2>
-              <span className="font-mono text-[11px] text-ink-3">{spaces.length} espacios</span>
+              <h2 className="text-title font-bold tracking-tight text-ink">{s}</h2>
+              <span className="font-mono text-eyebrow text-ink-3">{spaces.length} espacios</span>
             </div>
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
               {spaces.map((p) => {
@@ -130,7 +130,7 @@ export function Espacios({
                   >
                     {/* cabecera mono */}
                     <div className="flex items-center justify-between px-3.5 pt-3">
-                      <span className="font-mono text-[10px] tracking-[0.08em] text-ink-3">{p.code}</span>
+                      <span className="font-mono text-micro tracking-[0.08em] text-ink-3">{p.code}</span>
                       <ArrowUpRight size={13} className="text-ink-3 opacity-0 transition-opacity duration-150 group-hover:opacity-100" />
                     </div>
                     {/* sello: espécimen luminoso sobre montura */}
@@ -143,16 +143,16 @@ export function Espacios({
                     </div>
                     {/* lectura */}
                     <div className="border-t border-line px-3.5 py-3">
-                      <div className="truncate text-[13px] font-semibold text-ink">{p.name}</div>
+                      <div className="truncate text-body font-semibold text-ink">{p.name}</div>
                       <div className="mt-2 flex items-end justify-between gap-2">
                         <div>
-                          <div className="font-mono text-[9px] uppercase tracking-[0.12em] text-ink-3">Carga</div>
-                          <div className="tnum font-mono text-[22px] font-semibold leading-none text-ink">
+                          <div className="font-mono text-micro uppercase tracking-[0.12em] text-ink-3">Carga</div>
+                          <div className="tnum font-mono text-readout font-semibold leading-none text-ink">
                             {Math.round(globalLoad(p) * 100)}
-                            <span className="text-[13px] text-ink-3">%</span>
+                            <span className="text-body text-ink-3">%</span>
                           </div>
                         </div>
-                        <span className="inline-flex items-center gap-1.5 pb-0.5 text-[11px] text-ink-2">
+                        <span className="inline-flex items-center gap-1.5 pb-0.5 text-eyebrow text-ink-2">
                           <span className="h-2 w-2 rounded-full" style={{ background: CATEGORY_COLOR[dom] }} aria-hidden />
                           {getCategory(dom).name}
                         </span>

@@ -85,7 +85,7 @@ export function JourneyMap({ profiles }: { profiles: SensorProfile[] }) {
         {(["calm", "neutral", "stress"] as Band[]).map((b) => {
           const { label, sev, Icon } = BAND[b];
           return (
-            <span key={b} className="inline-flex items-center gap-1.5 text-[12px] text-ink-2">
+            <span key={b} className="inline-flex items-center gap-1.5 text-caption text-ink-2">
               <Icon size={15} style={{ color: SEVERITY_COLOR[sev] }} />
               {label}
             </span>
@@ -109,10 +109,10 @@ export function JourneyMap({ profiles }: { profiles: SensorProfile[] }) {
         return (
           <div key={site}>
             <div className="mb-1 flex items-baseline gap-2">
-              <h3 className="text-[15px] font-bold tracking-tight text-ink">{site}</h3>
-              <span className="font-mono text-[11px] text-ink-3">recorrido emocional · {n} etapas</span>
+              <h3 className="text-strong font-bold tracking-tight text-ink">{site}</h3>
+              <span className="font-mono text-eyebrow text-ink-3">recorrido emocional · {n} etapas</span>
             </div>
-            <p className="mb-4 max-w-[78ch] text-[12px] leading-relaxed text-ink-2">
+            <p className="mb-4 max-w-[78ch] text-caption leading-relaxed text-ink-2">
               Pico de tensión en <span className="font-semibold text-ink">{worst.p.name}</span> (por{" "}
               {getCategory(stressors(worst.p, 1)[0].id).name.toLowerCase()}).
               {n > 1 && (
@@ -132,7 +132,7 @@ export function JourneyMap({ profiles }: { profiles: SensorProfile[] }) {
                   return (
                     <span
                       key={b}
-                      className="absolute right-2 -translate-y-1/2 text-[9px] font-medium uppercase tracking-[0.06em]"
+                      className="absolute right-2 -translate-y-1/2 text-micro font-medium uppercase tracking-[0.06em]"
                       style={{ top: yMid, color: SEVERITY_COLOR[BAND[b].sev] }}
                     >
                       {BAND[b].label}
@@ -183,7 +183,7 @@ export function JourneyMap({ profiles }: { profiles: SensorProfile[] }) {
                           >
                             <Icon size={18} style={{ color: SEVERITY_COLOR[sev] }} />
                           </span>
-                          <span className="mt-0.5 text-[10px] font-bold" style={{ color: SEVERITY_COLOR[sev] }}>
+                          <span className="mt-0.5 text-micro font-bold" style={{ color: SEVERITY_COLOR[sev] }}>
                             {Math.round(pt.c * 100)}%
                           </span>
                         </div>
@@ -199,16 +199,16 @@ export function JourneyMap({ profiles }: { profiles: SensorProfile[] }) {
                           <SensorSeal profile={pt.p} />
                         </div>
                         <div className="w-full text-center">
-                          <div className="truncate text-[12px] font-bold text-ink" title={pt.p.name}>{pt.p.name}</div>
-                          <div className="font-mono text-[10px] text-ink-3">{pt.p.code}</div>
+                          <div className="truncate text-caption font-bold text-ink" title={pt.p.name}>{pt.p.name}</div>
+                          <div className="font-mono text-micro text-ink-3">{pt.p.code}</div>
                         </div>
 
                         <div className="mt-0.5 w-full">
-                          <div className="mb-1 text-[9px] font-semibold uppercase tracking-[0.06em] text-ink-3">Tensores</div>
+                          <div className="mb-1 text-micro font-semibold uppercase tracking-[0.06em] text-ink-3">Tensores</div>
                           <div className="flex flex-col gap-1">
                             {stressors(pt.p, 3).map((s) => (
                               <div key={s.id} className="flex items-center gap-1.5">
-                                <span className="w-[42px] shrink-0 truncate text-[9px] text-ink-2" title={s.name}>{s.name}</span>
+                                <span className="w-[42px] shrink-0 truncate text-micro text-ink-2" title={s.name}>{s.name}</span>
                                 <span className="h-1.5 flex-1 overflow-hidden rounded-full bg-sunken">
                                   <span className="block h-full rounded-full" style={{ width: `${Math.max(6, s.v * 100)}%`, background: CATEGORY_COLOR[s.id] }} />
                                 </span>
@@ -217,7 +217,7 @@ export function JourneyMap({ profiles }: { profiles: SensorProfile[] }) {
                           </div>
                         </div>
 
-                        <p className="mt-0.5 w-full text-[10px] leading-snug text-ink-2">{recommendation(pt.p)}</p>
+                        <p className="mt-0.5 w-full text-micro leading-snug text-ink-2">{recommendation(pt.p)}</p>
                       </div>
                     ))}
                   </div>

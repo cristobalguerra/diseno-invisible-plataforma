@@ -28,6 +28,13 @@ export interface CategoryParams {
   confidence: number;
   /** fuente del dato → estilo del marcador secundario discreto */
   source: DataSource;
+  /**
+   * ¿esta categoría fue evaluada (medida/capturada) en este espacio? Un espacio
+   * recién creado arranca con todas en false; medir (03) o ajustar el dato (02) la
+   * marca true. `undefined` se trata como evaluada (datos previos al marcador).
+   * Lo usa el mapa multicapa para "prender" solo lo evaluado.
+   */
+  evaluated?: boolean;
 }
 
 export type ProfileParams = Record<CategoryId, CategoryParams>;

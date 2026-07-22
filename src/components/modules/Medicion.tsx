@@ -1,13 +1,16 @@
-import { useMemo, useRef, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { Camera, Check, Info, Mic, Square, Sun, Volume2 } from "lucide-react";
-import type { CategoryId, Severity, Zone } from "../../lib/types";
+import type { CategoryId, Severity } from "../../lib/types";
+import type { SensorProfile } from "../../lib/labels/types";
 import { getCategory, SEVERITY_COLOR } from "../../data/catalog";
+import { setParam, intensitySeverity } from "../../lib/labels/profiles";
 import { useSensors } from "../../lib/useSensors";
 import { Button, Eyebrow, cx } from "../ui/kit";
 import { LevelMeter } from "../pictogram/LevelMeter";
 
-/* Umbrales de calibración: mapean la lectura normalizada (0..1) a severidad.
-   Heurísticos — ajústalos contra un sonómetro / luxómetro de referencia. */
+/* Umbrales de calibración: mapean la lectura normalizada (0..1) a severidad SOLO
+   para la vista previa en vivo. Heurísticos — ajústalos contra un sonómetro /
+   luxómetro de referencia. El dato guardado es la intensidad cruda 0..1. */
 function brightnessToSeverity(b: number): Severity {
   if (b < 0.35) return 0; // luz tenue
   if (b < 0.62) return 1; // luz media
@@ -19,12 +22,18 @@ function loudnessToSeverity(l: number): Severity {
   return 2; // ruido alto
 }
 
+const clamp01 = (x: number) => Math.max(0, Math.min(1, x));
+
 export function Medicion({
-  zones,
-  onZonesChange,
+  profiles,
+  onProfilesChange,
+  selectedId,
+  onSelectId,
 }: {
-  zones: Zone[];
-  onZonesChange: (z: Zone[]) => void;
+  profiles: SensorProfile[];
+  onProfilesChange: (p: SensorProfile[]) => void;
+  selectedId: string;
+  onSelectId: (id: string) => void;
 }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const { status, error, readings, audioInputs, audioDeviceId, start, stop, setAudioDevice } =
@@ -34,18 +43,34 @@ export function Medicion({
   const soundSev = useMemo(() => loudnessToSeverity(readings.loudness), [readings.loudness]);
   const lightSev = useMemo(() => brightnessToSeverity(readings.brightness), [readings.brightness]);
 
-  const [targetZoneId, setTargetZoneId] = useState(zones[0]?.id ?? "");
+  // espacio destino: por defecto el espacio seleccionado en la app (flujo de campo)
+  const [targetId, setTargetId] = useState(selectedId || profiles[0]?.id || "");
+  useEffect(() => {
+    if (selectedId) setTargetId(selectedId);
+  }, [selectedId]);
+
   const [applied, setApplied] = useState<string | null>(null);
 
-  function applyToZone() {
-    const z = zones.find((x) => x.id === targetZoneId) ?? zones[0];
-    if (!z) return;
-    onZonesChange(
-      zones.map((x) =>
-        x.id === z.id ? { ...x, levels: { ...x.levels, sound: soundSev, light: lightSev } } : x,
-      ),
-    );
-    setApplied(z.name);
+  // nivel que QUEDARÁ guardado (derivado de la intensidad, como el resto de la app)
+  const storedSoundWord = getCategory("sound").levels[intensitySeverity(clamp01(readings.loudness))].short;
+  const storedLightWord = getCategory("light").levels[intensitySeverity(clamp01(readings.brightness))].short;
+
+  function applyToSpace() {
+    const target = profiles.find((p) => p.id === targetId) ?? profiles[0];
+    if (!target) return;
+    // la lectura en vivo es fiable → fuente "sensor" y confianza alta. Se escribe
+    // solo intensidad+fuente+confianza; pico/variabilidad/duración no se tocan.
+    let np = setParam(target, "light", "intensity", clamp01(readings.brightness));
+    np = setParam(np, "light", "source", "sensor");
+    np = setParam(np, "light", "confidence", 0.9);
+    np = setParam(np, "light", "evaluated", true);
+    np = setParam(np, "sound", "intensity", clamp01(readings.loudness));
+    np = setParam(np, "sound", "source", "sensor");
+    np = setParam(np, "sound", "confidence", 0.9);
+    np = setParam(np, "sound", "evaluated", true);
+    onProfilesChange(profiles.map((p) => (p.id === np.id ? np : p)));
+    onSelectId(target.id);
+    setApplied(target.name);
     window.setTimeout(() => setApplied(null), 2800);
   }
 
@@ -53,13 +78,13 @@ export function Medicion({
     <div className="flex flex-col">
       <header className="border-b border-line px-5 py-6 md:px-8 md:py-7">
         <Eyebrow>03 · Medición</Eyebrow>
-        <h1 className="mt-2 text-[26px] font-bold leading-[1.1] tracking-tight text-ink md:text-[30px]">
-          Medir la zona con sensores
+        <h1 className="mt-2 text-display font-bold leading-[1.1] tracking-tight text-ink md:text-display-lg">
+          Medir el espacio con sensores
         </h1>
-        <p className="mt-2 max-w-[62ch] text-[14px] leading-relaxed text-ink-2">
+        <p className="mt-2 max-w-[62ch] text-strong leading-relaxed text-ink-2">
           La cámara estima la intensidad de luz y el micrófono (por ejemplo un Rode) mide el
-          nivel de sonido, en vivo. El sistema sugiere la severidad de <em>Luz</em> y{" "}
-          <em>Sonido</em>, y puedes volcarla a cualquier zona del recorrido.
+          nivel de sonido, en vivo. La lectura se guarda en el <em>sello sensorial</em> del{" "}
+          <em>espacio</em> que elijas, como dato de fuente <span className="font-mono">sensor</span>.
         </p>
       </header>
 
@@ -67,10 +92,10 @@ export function Medicion({
         {/* cámara */}
         <section className="flex flex-col">
           <div className="mb-2 flex items-baseline justify-between">
-            <span className="text-[12px] font-semibold uppercase tracking-[0.08em] text-ink-3">
+            <span className="text-caption font-semibold uppercase tracking-[0.08em] text-ink-3">
               Cámara
             </span>
-            <span className="font-mono text-[11px] text-ink-3">
+            <span className="font-mono text-eyebrow text-ink-3">
               {active ? "en vivo" : "inactiva"}
             </span>
           </div>
@@ -89,11 +114,11 @@ export function Medicion({
               <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-sunken px-6 text-center">
                 {status === "error" ? (
                   <>
-                    <span className="flex items-center gap-2 text-[13px] font-medium text-high">
+                    <span className="flex items-center gap-2 text-body font-medium text-high">
                       <Info size={16} />
                       No se pudo iniciar
                     </span>
-                    <p className="max-w-[42ch] text-[13px] leading-relaxed text-ink-2">{error}</p>
+                    <p className="max-w-[42ch] text-body leading-relaxed text-ink-2">{error}</p>
                     <Button variant="primary" icon={<Camera size={15} />} onClick={start}>
                       Reintentar
                     </Button>
@@ -101,7 +126,7 @@ export function Medicion({
                 ) : (
                   <>
                     <Camera size={26} className="text-ink-3" strokeWidth={1.75} />
-                    <p className="max-w-[40ch] text-[13px] leading-relaxed text-ink-2">
+                    <p className="max-w-[40ch] text-body leading-relaxed text-ink-2">
                       El navegador pedirá permiso para usar tu cámara y micrófono. Todo se procesa
                       aquí mismo: nada se graba ni se envía.
                     </p>
@@ -123,7 +148,7 @@ export function Medicion({
               <Button variant="outline" icon={<Square size={13} />} onClick={stop}>
                 Detener
               </Button>
-              <span className="flex items-center gap-1.5 font-mono text-[11px] text-ink-3">
+              <span className="flex items-center gap-1.5 font-mono text-eyebrow text-ink-3">
                 <span className="h-2 w-2 animate-pulse rounded-full bg-high" aria-hidden />
                 grabando lecturas (local)
               </span>
@@ -133,7 +158,7 @@ export function Medicion({
 
         {/* lecturas */}
         <section className="flex flex-col gap-4">
-          <span className="text-[12px] font-semibold uppercase tracking-[0.08em] text-ink-3">
+          <span className="text-caption font-semibold uppercase tracking-[0.08em] text-ink-3">
             Lecturas en vivo
           </span>
 
@@ -156,7 +181,7 @@ export function Medicion({
 
           {/* selector de micrófono (elige tu Rode) */}
           <label className="flex flex-col gap-1.5">
-            <span className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-3">
+            <span className="flex items-center gap-1.5 text-eyebrow font-semibold uppercase tracking-[0.08em] text-ink-3">
               <Mic size={12} />
               Entrada de audio
             </span>
@@ -164,7 +189,7 @@ export function Medicion({
               value={audioDeviceId ?? ""}
               disabled={!active || audioInputs.length === 0}
               onChange={(e) => setAudioDevice(e.target.value)}
-              className="w-full rounded-sm border border-line-strong bg-paper px-2.5 py-1.5 text-[13px] text-ink transition-colors duration-150 ease-out focus-visible:border-accent disabled:opacity-50"
+              className="w-full rounded-sm border border-line-strong bg-paper px-2.5 py-1.5 text-body text-ink transition-colors duration-150 ease-out focus-visible:border-accent disabled:opacity-50"
             >
               {audioInputs.length === 0 ? (
                 <option value="">{active ? "Sin entradas" : "Activa para listar micrófonos"}</option>
@@ -178,44 +203,53 @@ export function Medicion({
             </select>
           </label>
 
-          {/* volcar a zona */}
+          {/* volcar al sello del espacio */}
           <div className="mt-1 flex flex-col gap-2.5 rounded-md border border-line bg-paper p-4">
-            <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-3">
-              Aplicar a una zona
+            <span className="text-eyebrow font-semibold uppercase tracking-[0.08em] text-ink-3">
+              Guardar en un espacio
             </span>
             <div className="flex flex-wrap items-center gap-2">
               <select
-                value={targetZoneId}
-                onChange={(e) => setTargetZoneId(e.target.value)}
-                className="min-w-0 flex-1 rounded-sm border border-line-strong bg-paper px-2.5 py-1.5 text-[13px] text-ink transition-colors duration-150 ease-out focus-visible:border-accent"
+                value={targetId}
+                onChange={(e) => setTargetId(e.target.value)}
+                className="min-w-0 flex-1 rounded-sm border border-line-strong bg-paper px-2.5 py-1.5 text-body text-ink transition-colors duration-150 ease-out focus-visible:border-accent"
               >
-                {zones.map((z) => (
-                  <option key={z.id} value={z.id}>
-                    {z.code} · {z.name}
-                  </option>
+                {Object.entries(
+                  profiles.reduce((acc, p) => {
+                    (acc[p.site] ??= []).push(p);
+                    return acc;
+                  }, {} as Record<string, SensorProfile[]>),
+                ).map(([s, list]) => (
+                  <optgroup key={s} label={s}>
+                    {list.map((p) => (
+                      <option key={p.id} value={p.id}>
+                        {p.code} · {p.name}
+                      </option>
+                    ))}
+                  </optgroup>
                 ))}
               </select>
-              <Button variant="primary" onClick={applyToZone} disabled={!active}>
-                Aplicar Sonido y Luz
+              <Button variant="primary" onClick={applyToSpace} disabled={!active}>
+                Guardar Sonido y Luz
               </Button>
             </div>
             {applied ? (
-              <span className="flex items-center gap-1.5 text-[12px] font-medium text-low">
+              <span className="flex items-center gap-1.5 text-caption font-medium text-low">
                 <Check size={14} />
-                Aplicado a {applied}: Sonido {getCategory("sound").levels[soundSev].short}, Luz{" "}
-                {getCategory("light").levels[lightSev].short}.
+                Guardado en {applied}: Sonido {storedSoundWord}, Luz {storedLightWord}.
               </span>
             ) : (
-              <span className="text-[12px] leading-snug text-ink-3">
-                Escribe la severidad medida en <em>Sonido</em> y <em>Luz</em> de la zona elegida.
-                Las demás categorías no se tocan.
+              <span className="text-caption leading-snug text-ink-3">
+                Escribe la intensidad medida de <em>Sonido</em> y <em>Luz</em> en el sello del
+                espacio elegido (fuente <span className="font-mono">sensor</span>). Las demás
+                categorías no se tocan.
               </span>
             )}
           </div>
         </section>
       </div>
 
-      <footer className="flex items-start gap-2 border-t border-line px-5 py-4 text-[12px] leading-relaxed text-ink-3 md:px-8">
+      <footer className="flex items-start gap-2 border-t border-line px-5 py-4 text-caption leading-relaxed text-ink-3 md:px-8">
         <Info size={14} className="mt-0.5 shrink-0" />
         <span>
           Lecturas relativas, no calibradas a dB(A) ni lux. Sirven para clasificar Bajo/Medio/Alto;
@@ -250,7 +284,7 @@ function ReadingCard({
   return (
     <div className="rounded-md border border-line bg-paper p-4">
       <div className="flex items-center justify-between">
-        <span className="flex items-center gap-2 text-[13px] font-semibold text-ink">
+        <span className="flex items-center gap-2 text-body font-semibold text-ink">
           {icon}
           {cat.name}
         </span>
@@ -269,14 +303,14 @@ function ReadingCard({
       </div>
 
       <div className="mt-2.5 flex items-baseline justify-between">
-        <span className={cx("text-[15px] font-semibold", active ? "text-ink" : "text-ink-3")}>
+        <span className={cx("text-strong font-semibold", active ? "text-ink" : "text-ink-3")}>
           {active ? level.short : "—"}
         </span>
-        <span className="tnum font-mono text-[12px] text-ink-3">
+        <span className="tnum font-mono text-caption text-ink-3">
           {active ? `${pct}% · ${readout}` : readout}
         </span>
       </div>
-      <p className="mt-1 text-[12px] leading-snug text-ink-2">{active ? level.decision : "Activa los sensores para medir."}</p>
+      <p className="mt-1 text-caption leading-snug text-ink-2">{active ? level.decision : "Activa los sensores para medir."}</p>
     </div>
   );
 }
