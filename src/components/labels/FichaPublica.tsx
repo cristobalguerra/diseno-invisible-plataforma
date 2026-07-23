@@ -101,14 +101,12 @@ export function FichaPublica({ profiles, code }: { profiles: SensorProfile[]; co
         <PalabraSona profile={profile} estadoVisible={!leyendo} />
       </div>
 
-      {/* invitación silenciosa: solo la flecha */}
+      {/* invitación silenciosa: cilindro tipo indicador de iPhone */}
       <div
-        className="pointer-events-none absolute inset-x-0 bottom-9 z-30 flex justify-center transition-opacity duration-300"
+        className="pointer-events-none absolute inset-x-0 bottom-8 z-30 flex justify-center transition-opacity duration-300"
         style={{ opacity: leyendo ? 0 : 1 }}
       >
-        <svg width="18" height="10" viewBox="0 0 18 10" aria-hidden>
-          <path d="M1 9 L9 1 L17 9" fill="none" stroke={tono} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
+        <div style={{ width: 128, height: 5, borderRadius: 999, background: tono, opacity: 0.55 }} />
       </div>
 
       {/* la hoja fija; SOLO la caja de dimensiones es slider */}
